@@ -6,15 +6,6 @@ export default {
   ],
   theme: {
     extend: {
-      screens: {
-        '4k': '2560px',
-        // Desktop-first breakpoints
-        'max-lg': { max: '1023px' },
-        'max-md': { max: '767px' },
-      },
-      maxWidth: {
-        '4k': '1600px',
-      },
       colors: {
         primary: {
           50: '#eef2ff',
@@ -27,8 +18,9 @@ export default {
           700: '#4338ca',
           800: '#3730a3',
           900: '#312e81',
-        }
-      }
+          950: '#1e1b4b',
+        },
+      },
     },
   },
   plugins: [],

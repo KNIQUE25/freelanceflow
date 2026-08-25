@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-slate-50 lg:flex">
+  <div class="min-h-screen bg-slate-50 dark:bg-slate-950 lg:flex">
     <Sidebar :open="sidebarOpen" @close="sidebarOpen = false" />
     <div class="min-w-0 flex-1">
       <Navbar @menu="sidebarOpen = !sidebarOpen" />

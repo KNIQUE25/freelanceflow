@@ -2,7 +2,7 @@
   <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
     <div class="flex items-start justify-between gap-4"><div><h3 class="font-black text-slate-900">{{ invoice.invoice_number }}</h3><p class="mt-1 text-sm text-slate-500">{{ invoice.client?.name || 'Client' }}</p></div><span :class="statusClass" class="rounded-full px-2.5 py-1 text-xs font-bold">{{ prettyStatus }}</span></div>
     <div class="mt-5 grid grid-cols-2 gap-3 text-sm"><div><div class="text-xs text-slate-400">Due</div><div class="mt-1 font-semibold">{{ invoice.due_date }}</div></div><div class="text-right"><div class="text-xs text-slate-400">Total</div><div class="mt-1 font-black">KES {{ money(invoice.total) }}</div></div></div>
-    <div class="mt-5 flex items-center justify-between border-t border-slate-100 pt-4"><span class="text-sm text-slate-500">Balance <strong class="text-slate-900">KES {{ money(invoice.balance) }}</strong></span><div class="flex gap-3 text-sm font-bold"><router-link :to="`/invoices/${invoice.id}`" class="text-indigo-600">View</router-link><router-link :to="`/invoices/${invoice.id}/edit`" class="text-emerald-600">Edit</router-link></div></div>
+    <div class="mt-5 flex items-center justify-between border-t border-slate-100 pt-4"><span class="text-sm text-slate-500">Balance <strong class="text-slate-900">KES {{ money(invoice.balance) }}</strong></span><div class="flex gap-3 text-sm font-bold"><router-link :to="`/invoices/${invoice.id}`" class="text-primary-600">View</router-link><router-link :to="`/invoices/${invoice.id}/edit`" class="text-emerald-600">Edit</router-link></div></div>
   </article>
 </template>
 <script setup>

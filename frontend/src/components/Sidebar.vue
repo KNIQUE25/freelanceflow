@@ -20,7 +20,7 @@
         :key="item.to"
         :to="item.to"
         class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white"
-        active-class="bg-indigo-600 text-white shadow-lg shadow-indigo-950/30"
+        active-class="bg-primary-600 text-white shadow-lg shadow-primary-950/30"
         @click="close"
       >
         <span class="w-6 text-center">{{ item.icon }}</span>

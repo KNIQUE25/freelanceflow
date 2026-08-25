@@ -1,8 +1,11 @@
 <template>
   <div class="home-page min-h-screen overflow-x-hidden bg-[#f8f9ff] text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
-    <!-- Floating navigation -->
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
     <header class="absolute inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-5 lg:px-8 lg:pt-7">
       <div class="mx-auto flex max-w-[1440px] items-center justify-between rounded-[1.5rem] border border-white/70 bg-white/90 px-4 py-3 shadow-[0_18px_55px_rgba(15,23,42,0.12)] backdrop-blur-xl transition-colors duration-300 dark:border-slate-800/70 dark:bg-slate-900/90 sm:px-6 lg:rounded-full lg:px-7 lg:py-3.5">
+        <!-- Logo -->
         <router-link to="/" class="flex shrink-0 items-center gap-2.5" aria-label="FreelanceFlow home">
           <img
             src="/ff-logo.png"
@@ -21,6 +24,7 @@
           <a href="#features" class="nav-link">Features</a>
           <a href="#pricing" class="nav-link">Pricing</a>
           <a href="#how-it-works" class="nav-link">How It Works</a>
+          <a href="#faq" class="nav-link">FAQ</a>
           <a href="#contact" class="nav-link">Contact</a>
         </nav>
 
@@ -30,10 +34,10 @@
             type="button"
             class="grid h-10 w-10 place-items-center rounded-full bg-slate-50 text-slate-600 transition hover:bg-primary-50 hover:text-primary-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
             aria-label="Toggle dark mode"
-            :aria-pressed="darkMode"
-            @click="toggleDarkMode"
+            :aria-pressed="isDark"
+            @click="toggleTheme"
           >
-            <svg v-if="!darkMode" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <svg v-if="!isDark" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <path d="M12 3v2m0 14v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M3 12h2m14 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
               <circle cx="12" cy="12" r="4" />
             </svg>
@@ -41,10 +45,10 @@
               <path d="M21 12.79A9 9 0 0 1 11.21 3 7 7 0 1 0 21 12.79Z" />
             </svg>
           </button>
-          <router-link to="/auth/login" class="rounded-full px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800">
+          <router-link to="/login" class="rounded-full px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800">
             Login
           </router-link>
-          <router-link to="/auth/register" class="inline-flex items-center gap-2 rounded-full bg-primary-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary-600/20 transition hover:-translate-y-0.5 hover:bg-primary-700">
+          <router-link to="/register" class="inline-flex items-center gap-2 rounded-full bg-primary-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary-600/20 transition hover:-translate-y-0.5 hover:bg-primary-700">
             Get Started
             <span aria-hidden="true">→</span>
           </router-link>
@@ -75,13 +79,15 @@
           </a>
         </nav>
         <div class="mt-2 grid grid-cols-2 gap-2 border-t border-slate-100 pt-3 dark:border-slate-800">
-          <router-link to="/auth/login" class="rounded-2xl bg-slate-50 px-4 py-3 text-center text-sm font-semibold dark:bg-slate-800 dark:text-slate-100" @click="mobileMenuOpen = false">Login</router-link>
-          <router-link to="/auth/register" class="rounded-2xl bg-primary-600 px-4 py-3 text-center text-sm font-bold text-white" @click="mobileMenuOpen = false">Get Started</router-link>
+          <router-link to="/login" class="rounded-2xl bg-slate-50 px-4 py-3 text-center text-sm font-semibold dark:bg-slate-800 dark:text-slate-100" @click="mobileMenuOpen = false">Login</router-link>
+          <router-link to="/register" class="rounded-2xl bg-primary-600 px-4 py-3 text-center text-sm font-bold text-white" @click="mobileMenuOpen = false">Get Started</router-link>
         </div>
       </div>
     </header>
 
-    <!-- Hero -->
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
     <main id="home">
       <section class="relative px-3 pt-28 sm:px-5 sm:pt-32 lg:px-8 lg:pt-36">
         <div class="relative mx-auto min-h-[690px] max-w-[1440px] overflow-hidden rounded-[2rem] bg-slate-950 shadow-[0_30px_90px_rgba(15,23,42,0.24)] sm:min-h-[720px] sm:rounded-[2.5rem] lg:min-h-[700px]">
@@ -139,7 +145,7 @@
               </p>
 
               <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-                <router-link to="/auth/register" class="inline-flex items-center justify-center gap-2 rounded-full bg-primary-600 px-7 py-3.5 text-sm font-bold text-white shadow-xl shadow-primary-950/30 transition hover:-translate-y-0.5 hover:bg-primary-500 sm:text-base">
+                <router-link to="/register" class="inline-flex items-center justify-center gap-2 rounded-full bg-primary-600 px-7 py-3.5 text-sm font-bold text-white shadow-xl shadow-primary-950/30 transition hover:-translate-y-0.5 hover:bg-primary-500 sm:text-base">
                   Get Started Free <span aria-hidden="true">→</span>
                 </router-link>
                 <a href="#features" class="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 bg-white/5 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/10 sm:text-base">
@@ -166,14 +172,16 @@
                 <small class="block truncate text-xs text-slate-500 dark:text-slate-400">{{ item.description }}</small>
               </span>
             </a>
-            <router-link to="/auth/register" class="hidden items-center justify-center gap-2 bg-primary-600 px-5 text-sm font-bold text-white transition hover:bg-primary-700 lg:flex">
+            <router-link to="/register" class="hidden items-center justify-center gap-2 bg-primary-600 px-5 text-sm font-bold text-white transition hover:bg-primary-700 lg:flex">
               Get Started <span>→</span>
             </router-link>
           </div>
         </div>
       </section>
 
-      <!-- About / How It Works -->
+      <!-- =====================================================
+           ABOUT / HOW IT WORKS
+      ====================================================== -->
       <section id="how-it-works" class="scroll-mt-24 px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
         <div class="mx-auto grid max-w-[1440px] items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <div class="relative mx-auto w-full max-w-xl">
@@ -223,12 +231,14 @@
               </li>
             </ul>
 
-            <router-link to="/auth/register" class="mt-8 inline-flex items-center gap-2 rounded-full bg-primary-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-primary-600/20 transition hover:-translate-y-0.5 hover:bg-primary-700">Start for free <span>→</span></router-link>
+            <router-link to="/register" class="mt-8 inline-flex items-center gap-2 rounded-full bg-primary-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-primary-600/20 transition hover:-translate-y-0.5 hover:bg-primary-700">Start for free <span>→</span></router-link>
           </div>
         </div>
       </section>
 
-      <!-- Features -->
+      <!-- =====================================================
+           FEATURES
+      ====================================================== -->
       <section id="features" class="scroll-mt-24 bg-white px-4 py-20 transition-colors duration-300 dark:bg-slate-900 sm:px-6 lg:px-8 lg:py-28">
         <div class="mx-auto max-w-[1440px]">
           <div class="mx-auto max-w-2xl text-center">
@@ -264,7 +274,36 @@
         </div>
       </section>
 
-      <!-- Pricing / CTA -->
+      <!-- =====================================================
+           FAQ SECTION (NEW)
+      ====================================================== -->
+      <section id="faq" class="bg-white px-4 py-16 transition-colors duration-300 dark:bg-slate-950 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+        <div class="mx-auto max-w-3xl">
+          <div class="mx-auto mb-12 max-w-2xl text-center">
+            <p class="text-sm font-bold uppercase tracking-wider text-primary-600 dark:text-primary-400">FAQ</p>
+            <h2 class="mt-3 text-3xl font-black text-slate-900 dark:text-white sm:text-4xl">Frequently Asked Questions</h2>
+            <p class="mt-4 text-slate-600 dark:text-slate-400">Quick answers to the questions freelancers ask most.</p>
+          </div>
+
+          <div class="space-y-4">
+            <details v-for="(item, idx) in homeFaqs" :key="idx" class="group rounded-2xl border border-slate-200 p-6 dark:border-slate-800">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-bold text-slate-900 dark:text-white">
+                <span>{{ item.question }}</span>
+                <span class="text-2xl text-primary-600 transition group-open:rotate-45">+</span>
+              </summary>
+              <p class="mt-4 leading-7 text-slate-600 dark:text-slate-400">{{ item.answer }}</p>
+            </details>
+          </div>
+
+          <div class="mt-8 text-center">
+            <router-link to="/faq" class="font-bold text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">View all frequently asked questions →</router-link>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================
+           PRICING / CTA
+      ====================================================== -->
       <section id="pricing" class="scroll-mt-24 px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
         <div class="relative mx-auto max-w-[1440px] overflow-hidden rounded-[2rem] bg-gradient-to-br from-primary-50 via-emerald-50 to-primary-100/30 px-6 py-12 transition-colors duration-300 dark:from-slate-800 dark:via-slate-900 dark:to-primary-900/20 sm:px-10 lg:px-14 lg:py-14">
           <div class="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-primary-200/40 blur-3xl dark:bg-primary-800/20"></div>
@@ -274,7 +313,7 @@
               <h2 class="mt-3 text-3xl font-black tracking-tight text-slate-900 dark:text-slate-50 sm:text-4xl">Ready to simplify your freelance business?</h2>
               <p class="mt-4 max-w-xl text-base leading-7 text-slate-600 dark:text-slate-300">Join freelancers who use FreelanceFlow to manage their clients, invoices and payments with less effort.</p>
               <div class="mt-7 flex flex-col gap-3 sm:flex-row">
-                <router-link to="/auth/register" class="inline-flex items-center justify-center gap-2 rounded-full bg-primary-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-primary-600/20 hover:bg-primary-700">Get Started Free <span>→</span></router-link>
+                <router-link to="/register" class="inline-flex items-center justify-center gap-2 rounded-full bg-primary-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-primary-600/20 hover:bg-primary-700">Get Started Free <span>→</span></router-link>
                 <a href="#features" class="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-bold text-slate-700 shadow-sm hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700">View Features <span>→</span></a>
               </div>
             </div>
@@ -292,7 +331,9 @@
       </section>
     </main>
 
-    <!-- Footer -->
+    <!-- =====================================================
+         FOOTER – Updated with router-links
+    ====================================================== -->
     <footer id="contact" class="border-t border-slate-200 bg-white px-4 py-12 transition-colors duration-300 dark:border-slate-800 dark:bg-slate-950 sm:px-6 lg:px-8">
       <div class="mx-auto grid max-w-[1440px] gap-10 lg:grid-cols-5">
         <div class="lg:col-span-2">
@@ -305,13 +346,19 @@
             <a v-for="social in socials" :key="social" href="#contact" class="grid h-9 w-9 place-items-center rounded-full bg-slate-50 text-xs font-bold text-slate-500 hover:bg-primary-50 hover:text-primary-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-primary-400">{{ social }}</a>
           </div>
         </div>
+
         <div class="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-3 lg:grid-cols-subgrid">
           <div v-for="column in footerColumns" :key="column.title">
             <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">{{ column.title }}</h3>
-            <ul class="mt-4 space-y-3 text-sm text-slate-500 dark:text-slate-400"><li v-for="link in column.links" :key="link"><a href="#home" class="hover:text-primary-600 dark:hover:text-primary-400">{{ link }}</a></li></ul>
+            <ul class="mt-4 space-y-3 text-sm text-slate-500 dark:text-slate-400">
+              <li v-for="link in column.links" :key="link.to">
+                <router-link :to="link.to" class="transition hover:text-primary-600 dark:hover:text-primary-400">{{ link.label }}</router-link>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
+
       <div class="mx-auto mt-10 flex max-w-[1440px] flex-col justify-between gap-3 border-t border-slate-100 pt-6 text-xs text-slate-400 dark:border-slate-800 dark:text-slate-500 sm:flex-row">
         <span>© {{ currentYear }} FreelanceFlow. All rights reserved.</span>
         <span>Built for independent professionals.</span>
@@ -321,40 +368,30 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, computed } from 'vue'
+import { useThemeStore } from '../stores/theme'
 
+// -------- THEME --------
+const themeStore = useThemeStore()
+const isDark = computed(() => themeStore.isDark)
+
+const toggleTheme = () => {
+  const current = themeStore.theme
+  if (current === 'system') themeStore.setTheme('light')
+  else if (current === 'light') themeStore.setTheme('dark')
+  else themeStore.setTheme('system')
+}
+
+// -------- OTHER DATA --------
 const currentYear = new Date().getFullYear()
 const mobileMenuOpen = ref(false)
-const darkMode = ref(false)
-
-const THEME_STORAGE_KEY = 'ff-theme'
-
-function applyTheme(isDark) {
-  document.documentElement.classList.toggle('dark', isDark)
-}
-
-function toggleDarkMode() {
-  darkMode.value = !darkMode.value
-}
-
-onMounted(() => {
-  const stored = localStorage.getItem(THEME_STORAGE_KEY)
-  darkMode.value = stored
-    ? stored === 'dark'
-    : window.matchMedia('(prefers-color-scheme: dark)').matches
-  applyTheme(darkMode.value)
-})
-
-watch(darkMode, (isDark) => {
-  applyTheme(isDark)
-  localStorage.setItem(THEME_STORAGE_KEY, isDark ? 'dark' : 'light')
-})
 
 const navItems = [
   { label: 'Home', href: '#home' },
   { label: 'Features', href: '#features' },
   { label: 'Pricing', href: '#pricing' },
   { label: 'How It Works', href: '#how-it-works' },
+  { label: 'FAQ', href: '#faq' },
   { label: 'Contact', href: '#contact' },
 ]
 
@@ -418,9 +455,36 @@ const features = [
 ]
 
 const footerColumns = [
-  { title: 'Product', links: ['Features', 'Pricing', 'How It Works'] },
-  { title: 'Company', links: ['About Us', 'Contact', 'Blog'] },
-  { title: 'Legal', links: ['Terms of Service', 'Privacy Policy'] },
+  {
+    title: 'Product',
+    links: [
+      { label: 'Features', to: '/features' },
+      { label: 'Pricing', to: '/pricing' },
+      { label: 'How It Works', to: '/how-it-works' },
+      { label: 'FAQ', to: '/faq' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { label: 'About Us', to: '/about' },
+      { label: 'Contact', to: '/contact' },
+    ],
+  },
+  {
+    title: 'Legal',
+    links: [
+      { label: 'Terms of Service', to: '/terms' },
+      { label: 'Privacy Policy', to: '/privacy' },
+    ],
+  },
+]
+
+const homeFaqs = [
+  { question: 'What is FreelanceFlow?', answer: 'FreelanceFlow helps freelancers manage clients, invoices, payments and business information from one place.' },
+  { question: 'Can I create PDF invoices?', answer: 'Yes. You can create professional invoices and download them as PDF documents.' },
+  { question: 'Does FreelanceFlow support M-Pesa?', answer: 'Yes. FreelanceFlow is designed to support M-Pesa STK Push payments when the payment integration is configured.' },
+  { question: 'Can I track outstanding invoices?', answer: 'Yes. The application tracks invoice status, paid amounts and outstanding balances.' },
 ]
 
 const socials = ['f', '𝕏', 'in']
@@ -463,42 +527,5 @@ button:focus-visible {
   }
 }
 
-/* Primary color is emerald/green */
-.text-primary-50 { color: #ecfdf5; }
-.text-primary-100 { color: #d1fae5; }
-.text-primary-200 { color: #a7f3d0; }
-.text-primary-300 { color: #6ee7b7; }
-.text-primary-400 { color: #34d399; }
-.text-primary-500 { color: #10b981; }
-.text-primary-600 { color: #059669; }
-.text-primary-700 { color: #047857; }
-.text-primary-800 { color: #065f46; }
-.text-primary-900 { color: #064e3b; }
-
-.bg-primary-50 { background-color: #ecfdf5; }
-.bg-primary-100 { background-color: #d1fae5; }
-.bg-primary-200 { background-color: #a7f3d0; }
-.bg-primary-300 { background-color: #6ee7b7; }
-.bg-primary-400 { background-color: #34d399; }
-.bg-primary-500 { background-color: #10b981; }
-.bg-primary-600 { background-color: #059669; }
-.bg-primary-700 { background-color: #047857; }
-.bg-primary-800 { background-color: #065f46; }
-.bg-primary-900 { background-color: #064e3b; }
-
-.border-primary-200 { border-color: #a7f3d0; }
-.border-primary-300 { border-color: #6ee7b7; }
-
-.shadow-primary-600\/20 { box-shadow: 0 8px 30px rgba(5, 150, 105, 0.2); }
-.shadow-primary-950\/30 { box-shadow: 0 8px 30px rgba(2, 44, 27, 0.3); }
-
-.hover\:bg-primary-50:hover { background-color: #ecfdf5; }
-.hover\:bg-primary-100:hover { background-color: #d1fae5; }
-.hover\:bg-primary-600:hover { background-color: #059669; }
-.hover\:bg-primary-700:hover { background-color: #047857; }
-.hover\:text-primary-600:hover { color: #059669; }
-
-:global(.dark) .hover\:text-primary-400:hover { color: #34d399; }
-:global(.dark) .bg-primary-600 { background-color: #059669; }
-:global(.dark) .hover\:bg-primary-700:hover { background-color: #047857; }
+/* Primary color overrides – already defined in main.css via Tailwind v3 */
 </style>

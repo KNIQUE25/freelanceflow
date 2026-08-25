@@ -4,23 +4,23 @@
     <form @submit.prevent="handleSubmit">
       <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700">Email</label>
-        <input v-model="email" type="email" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+        <input v-model="email" type="email" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500" required />
       </div>
       <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700">New Password</label>
-        <input v-model="password" type="password" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+        <input v-model="password" type="password" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500" required />
       </div>
       <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700">Confirm Password</label>
-        <input v-model="password_confirmation" type="password" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+        <input v-model="password_confirmation" type="password" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500" required />
       </div>
-      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition" :disabled="loading">
+      <button type="submit" class="w-full bg-primary-600 text-white py-2 rounded hover:bg-primary-700 transition" :disabled="loading">
         {{ loading ? 'Resetting...' : 'Reset Password' }}
       </button>
       <p v-if="message" :class="['text-sm mt-2', success ? 'text-green-600' : 'text-red-600']">{{ message }}</p>
     </form>
     <p class="mt-4 text-sm text-center">
-      <router-link to="/login" class="text-blue-600 hover:underline">Back to Login</router-link>
+      <router-link to="/login" class="text-primary-600 hover:underline">Back to Login</router-link>
     </p>
   </div>
 </template>
@@ -28,7 +28,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
+import { useAuthStore } from '../../stores/auth'
 
 const route = useRoute()
 const router = useRouter()
