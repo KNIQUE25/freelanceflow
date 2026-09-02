@@ -3,12 +3,18 @@ set -e
 
 echo "Starting Application..."
 
+# Ensure the views directory exists (fixes "View path not found")
+if [ ! -d "/var/www/resources/views" ]; then
+    mkdir -p /var/www/resources/views
+    echo "Created /var/www/resources/views"
+fi
+
 # Generate app key only if .env exists AND APP_KEY is empty
 if [ -z "$APP_KEY" ] && [ -f /var/www/.env ]; then
     php artisan key:generate --force
 fi
 
-# Clear any stale caches
+# Clear any stale caches (view:clear will now succeed)
 php artisan config:clear
 php artisan route:clear
 php artisan view:clear
