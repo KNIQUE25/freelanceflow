@@ -10,20 +10,42 @@ use App\Services\InvoiceService;
 use App\Services\PdfService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
 {
-    public function __construct(private InvoiceService $service, private PdfService $pdfService) {}
+    protected InvoiceService $service;
+    protected PdfService $pdfService;
 
-    public function index(): AnonymousResourceCollection
+    public function __construct(InvoiceService $service, PdfService $pdfService)
     {
-        return InvoiceResource::collection($this->service->getAllForUser(auth()->id()));
+        $this->service = $service;
+        $this->pdfService = $pdfService;
     }
 
-    public function store(StoreInvoiceRequest $request): JsonResponse
+    public function index(Request $request): AnonymousResourceCollection
     {
-        return (new InvoiceResource($this->service->create(auth()->id(), $request->validated())))->response()->setStatusCode(201);
+        $search = $request->get('search');
+        $status = $request->get('status');
+        $dateFrom = $request->get('date_from');
+        $dateTo = $request->get('date_to');
+        $perPage = $request->get('per_page', 15);
+
+        $invoices = $this->service->getAllForUser(
+            auth()->id(),
+            $search,
+            $status,
+            $dateFrom,
+            $dateTo,
+            $perPage
+        );
+        return InvoiceResource::collection($invoices);
+    }
+
+    public function store(StoreInvoiceRequest $request): InvoiceResource
+    {
+        $invoice = $this->service->create(auth()->id(), $request->validated());
+        return new InvoiceResource($invoice);
     }
 
     public function show(Invoice $invoice): InvoiceResource
@@ -35,7 +57,8 @@ class InvoiceController extends Controller
     public function update(UpdateInvoiceRequest $request, Invoice $invoice): InvoiceResource
     {
         $this->authorize('update', $invoice);
-        return new InvoiceResource($this->service->update($invoice, $request->validated()));
+        $invoice = $this->service->update($invoice, $request->validated());
+        return new InvoiceResource($invoice);
     }
 
     public function destroy(Invoice $invoice): JsonResponse
@@ -45,12 +68,20 @@ class InvoiceController extends Controller
         return response()->json(['message' => 'Invoice deleted successfully.']);
     }
 
-    public function pdf(Invoice $invoice): Response
+    public function pdf(Invoice $invoice)
+{
+    $this->authorize('view', $invoice);
+    $pdf = $this->pdfService->generateInvoice($invoice);
+    return response($pdf, 200, [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => 'attachment; filename="invoice-' . $invoice->invoice_number . '.pdf"',
+    ]);
+}
+
+    public function publicUrl(Invoice $invoice)
     {
         $this->authorize('view', $invoice);
-        return response($this->pdfService->generateInvoice($invoice), 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="invoice-' . $invoice->invoice_number . '.pdf"',
-        ]);
+        $url = url('/public/invoice/' . $invoice->public_uuid);
+        return response()->json(['url' => $url]);
     }
 }

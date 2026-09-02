@@ -1,14 +1,107 @@
 <template>
-  <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
-    <div class="flex items-start justify-between gap-4"><div><h3 class="font-black text-slate-900">{{ invoice.invoice_number }}</h3><p class="mt-1 text-sm text-slate-500">{{ invoice.client?.name || 'Client' }}</p></div><span :class="statusClass" class="rounded-full px-2.5 py-1 text-xs font-bold">{{ prettyStatus }}</span></div>
-    <div class="mt-5 grid grid-cols-2 gap-3 text-sm"><div><div class="text-xs text-slate-400">Due</div><div class="mt-1 font-semibold">{{ invoice.due_date }}</div></div><div class="text-right"><div class="text-xs text-slate-400">Total</div><div class="mt-1 font-black">KES {{ money(invoice.total) }}</div></div></div>
-    <div class="mt-5 flex items-center justify-between border-t border-slate-100 pt-4"><span class="text-sm text-slate-500">Balance <strong class="text-slate-900">KES {{ money(invoice.balance) }}</strong></span><div class="flex gap-3 text-sm font-bold"><router-link :to="`/invoices/${invoice.id}`" class="text-primary-600">View</router-link><router-link :to="`/invoices/${invoice.id}/edit`" class="text-emerald-600">Edit</router-link></div></div>
-  </article>
+  <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-lg">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div>
+        <div class="flex items-center gap-2">
+          <h3 class="text-lg font-bold text-slate-900">{{ invoice.invoice_number }}</h3>
+          <span
+            :class="[
+              'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
+              invoice.status === 'paid' ? 'bg-green-100 text-green-800' :
+              invoice.status === 'overdue' ? 'bg-red-100 text-red-800' :
+              invoice.status === 'partially_paid' ? 'bg-yellow-100 text-yellow-800' :
+              'bg-gray-100 text-gray-800'
+            ]"
+          >
+            {{ invoice.status.replace('_', ' ') }}
+          </span>
+        </div>
+        <p class="text-sm text-slate-500">Client: {{ invoice.client?.name }}</p>
+        <p class="text-sm text-slate-500">Due: {{ invoice.due_date }}</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-lg font-bold text-indigo-600">KES {{ invoice.total }}</span>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mt-4 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-4">
+      <router-link
+        :to="`/invoices/${invoice.id}`"
+        class="inline-flex items-center rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-600 hover:bg-indigo-100"
+      >
+        👁️ View
+      </router-link>
+
+      <router-link
+        :to="`/invoices/${invoice.id}/edit`"
+        class="inline-flex items-center rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-600 hover:bg-amber-100"
+      >
+        ✏️ Edit
+      </router-link>
+
+      <button
+        @click="downloadPdf(invoice.id)"
+        class="inline-flex items-center rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-100"
+      >
+        📄 PDF
+      </button>
+
+      <button
+        @click="copyPublicLink(invoice.id)"
+        class="inline-flex items-center rounded-lg bg-green-50 px-3 py-1.5 text-xs font-medium text-green-600 hover:bg-green-100"
+      >
+        🔗 Share
+      </button>
+
+      <button
+        @click="$emit('delete-invoice', invoice.id)"
+        class="inline-flex items-center rounded-lg bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-100"
+      >
+        🗑️ Delete
+      </button>
+    </div>
+  </div>
 </template>
+
 <script setup>
-import { computed } from 'vue'
-const props = defineProps({ invoice: { type: Object, required: true } })
-const money = (v) => Number(v || 0).toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-const prettyStatus = computed(() => String(props.invoice.status || '').replaceAll('_', ' '))
-const statusClass = computed(() => ({ paid: 'bg-emerald-100 text-emerald-700', overdue: 'bg-red-100 text-red-700', partially_paid: 'bg-amber-100 text-amber-700', unpaid: 'bg-slate-100 text-slate-700' }[props.invoice.status] || 'bg-slate-100 text-slate-700'))
+import { defineProps, defineEmits } from 'vue'
+import api from '../services/api'
+
+const props = defineProps({
+  invoice: { type: Object, required: true },
+})
+
+const emit = defineEmits(['delete-invoice'])
+
+// Download PDF
+async function downloadPdf(invoiceId) {
+  try {
+    const response = await api.get(`/api/invoices/${invoiceId}/pdf`, {
+      responseType: 'blob',
+    })
+    const url = window.URL.createObjectURL(new Blob([response.data]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `invoice-${props.invoice.invoice_number}.pdf`)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.URL.revokeObjectURL(url)
+  } catch (e) {
+    alert('Failed to download PDF.')
+  }
+}
+
+// Copy public link
+async function copyPublicLink(invoiceId) {
+  try {
+    const response = await api.get(`/api/invoices/${invoiceId}/public-url`)
+    const url = response.data.url
+    await navigator.clipboard.writeText(url)
+    alert('Public invoice link copied to clipboard!')
+  } catch (e) {
+    alert('Failed to generate public link.')
+  }
+}
 </script>

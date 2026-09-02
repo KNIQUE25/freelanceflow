@@ -12,7 +12,7 @@ class Invoice extends Model
     protected $fillable = [
         'client_id', 'invoice_number', 'invoice_year', 'number_sequence',
         'issue_date', 'due_date', 'subtotal', 'tax', 'total', 'paid_amount',
-        'status', 'note',
+        'status', 'note','public_uuid',
     ];
 
     protected function casts(): array
@@ -43,4 +43,22 @@ class Invoice extends Model
         return $query->whereDate('due_date', '<=', now()->addDays($days))
             ->where('status', '!=', 'paid');
     }
+
+    // Add boot method to auto-generate UUID
+protected static function boot()
+{
+    parent::boot();
+    
+    static::creating(function ($invoice) {
+        if (empty($invoice->public_uuid)) {
+            $invoice->public_uuid = (string) \Illuminate\Support\Str::uuid();
+        }
+    });
+}
+
+// Add scope to find by public UUID
+public function scopeByPublicUuid($query, $uuid)
+{
+    return $query->where('public_uuid', $uuid);
+}
 }

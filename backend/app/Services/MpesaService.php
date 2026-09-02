@@ -70,7 +70,33 @@ class MpesaService
         }
         return $result;
     }
+    /**
+ * Query transaction status using checkout request ID.
+ */
+public function queryStatus(string $checkoutRequestId): array
+{
+    $token = $this->getAccessToken();
 
+    $timestamp = now()->format('YmdHis');
+    $password = base64_encode($this->shortcode . $this->passkey . $timestamp);
+
+    $payload = [
+        'BusinessShortCode' => $this->shortcode,
+        'Password' => $password,
+        'Timestamp' => $timestamp,
+        'CheckoutRequestID' => $checkoutRequestId,
+    ];
+
+    $response = Http::withToken($token)
+        ->post($this->baseUrl . '/mpesa/stkpushquery/v1/query', $payload);
+
+    if ($response->failed()) {
+        Log::error('M-Pesa status query failed', ['response' => $response->body()]);
+        throw new \Exception('Failed to query transaction status.');
+    }
+
+    return $response->json();
+}
     public function handleCallback(array $payload): void
     {
         $body = $payload['Body']['stkCallback'] ?? null;

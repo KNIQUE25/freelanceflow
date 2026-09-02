@@ -2,41 +2,52 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
+use App\Services\ClientService;
 use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientRequest;
 use App\Http\Resources\ClientResource;
-use App\Models\Client;
-use App\Services\ClientService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Request;
 
 class ClientController extends Controller
 {
-    public function __construct(private ClientService $service) {}
+    protected ClientService $service;
 
-    public function index(): AnonymousResourceCollection
+    public function __construct(ClientService $service)
     {
-        return ClientResource::collection($this->service->getAllForUser(auth()->id()));
+        $this->service = $service;
     }
 
-    public function store(StoreClientRequest $request): JsonResponse
+    public function index(Request $request)
     {
-        return (new ClientResource($this->service->create(auth()->id(), $request->validated())))->response()->setStatusCode(201);
+        $search = $request->get('search');
+        $perPage = $request->get('per_page', 15);
+
+        $clients = $this->service->getAllForUser(auth()->id(), $search, $perPage);
+        return ClientResource::collection($clients);
     }
 
-    public function show(Client $client): ClientResource
+    public function store(StoreClientRequest $request)
+    {
+        $client = $this->service->create($request->validated());
+        return new ClientResource($client);
+    }
+
+    public function show(Client $client)
     {
         $this->authorize('view', $client);
-        return new ClientResource($client->load('invoices'));
+        $client->load('invoices');
+        return new ClientResource($client);
     }
 
-    public function update(UpdateClientRequest $request, Client $client): ClientResource
+    public function update(UpdateClientRequest $request, Client $client)
     {
         $this->authorize('update', $client);
-        return new ClientResource($this->service->update($client, $request->validated()));
+        $client = $this->service->update($client, $request->validated());
+        return new ClientResource($client);
     }
 
-    public function destroy(Client $client): JsonResponse
+    public function destroy(Client $client)
     {
         $this->authorize('delete', $client);
         $this->service->delete($client);

@@ -1,51 +1,58 @@
 <template>
-  <header class="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white/90 px-4 dark:border-slate-800 dark:bg-slate-900/90 backdrop-blur sm:px-6">
-    <div class="flex items-center gap-3">
-      <button class="rounded-xl border border-slate-200 p-2 text-slate-600 dark:border-slate-700 dark:text-slate-300 hover:bg-slate-50 lg:hidden" aria-label="Open menu" @click="$emit('menu')">☰</button>
-      <div>
-        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Workspace</p>
+  <header class="bg-white px-4 py-3 shadow-sm dark:bg-slate-900 sm:px-6">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <button
+          class="text-slate-500 lg:hidden"
+          @click="$emit('toggle-sidebar')"
+          aria-label="Toggle menu"
+        >
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
         <h1 class="text-base font-black text-slate-900 dark:text-white sm:text-lg">{{ currentRoute }}</h1>
       </div>
-    </div>
 
-    <div class="flex items-center gap-2 sm:gap-4">
-      <ThemeSwitcher />
-      <router-link to="/notifications" class="relative rounded-xl p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800" aria-label="Notifications">
-        <span class="text-xl">♢</span>
-        <span v-if="unreadCount" class="absolute right-0 top-0 grid h-5 min-w-5 place-items-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">{{ unreadCount }}</span>
-      </router-link>
-      <div class="hidden text-right sm:block">
+      <div class="flex items-center gap-4">
+        <router-link to="/notifications" class="relative text-slate-500 hover:text-primary-600 dark:text-slate-400 dark:hover:text-primary-400">
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <span v-if="unreadCount" class="absolute right-0 top-0 grid h-5 min-w-5 place-items-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">{{ unreadCount }}</span>
+        </router-link>
+
         <div class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ user?.name }}</div>
-        <div class="text-xs text-slate-400">{{ user?.email }}</div>
+        <button
+          class="rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+          @click="handleLogout"
+        >
+          Logout
+        </button>
       </div>
-      <button class="rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800" @click="handleLogout">Logout</button>
     </div>
   </header>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useNotificationsStore } from '../stores/notifications'
-import ThemeSwitcher from './ThemeSwitcher.vue'
 
-defineEmits(['menu'])
+defineEmits(['toggle-sidebar'])
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const notificationsStore = useNotificationsStore()
+
 const user = computed(() => authStore.user)
 const unreadCount = computed(() => notificationsStore.unreadCount)
+
 const currentRoute = computed(() => {
-  const value = route.name || 'dashboard'
-  return String(value).replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  const name = route.name
+  if (!name) return 'Dashboard'
+  return name.charAt(0).toUpperCase() + name.slice(1).replace(/-/g, ' ')
 })
 
-onMounted(() => notificationsStore.fetchNotifications())
-
-async function handleLogout() {
+const handleLogout = async () => {
   await authStore.logout()
   router.push('/login')
 }

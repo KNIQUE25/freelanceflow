@@ -7,10 +7,11 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class PdfService
 {
-    public function generateInvoice(Invoice $invoice): string
+    public function generateInvoice(Invoice $invoice)
     {
         $invoice->load(['client', 'items']);
         $business = auth()->user()->businessProfile;
-        return Pdf::loadView('pdf.invoice', compact('invoice', 'business'))->output();
+        $pdf = Pdf::loadView('pdf.invoice', compact('invoice', 'business'));
+        return $pdf->output();
     }
 }

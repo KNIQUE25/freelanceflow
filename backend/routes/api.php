@@ -43,7 +43,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('clients', ClientController::class);
     Route::apiResource('invoices', InvoiceController::class);
-    Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'pdf']);
+    Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->middleware('auth:sanctum');
+
+    Route::get('/public/invoice/{uuid}', [PublicInvoiceController::class, 'show']);
+    Route::post('/payments/{payment}/verify', [PaymentController::class, 'verify']);
+Route::post('/public/invoice/{uuid}/pay', [PublicInvoiceController::class, 'pay']);
+Route::get('/public/invoice/{uuid}/status', [PublicInvoiceController::class, 'status']);
+Route::get('/invoices/{invoice}/public-url', [InvoiceController::class, 'publicUrl'])
+    ->middleware('auth:sanctum');
 
     Route::apiResource('payments', PaymentController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::post('/mpesa/stk-push', [MpesaController::class, 'stkPush']);

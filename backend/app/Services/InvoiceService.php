@@ -14,14 +14,45 @@ class InvoiceService
 {
     public function __construct(private AuditService $audit) {}
 
-    public function getAllForUser(int $userId): LengthAwarePaginator
-    {
-        return Invoice::query()
+    /**
+     * Get all invoices for a user with optional search, status, and date filters.
+     */
+    public function getAllForUser(
+        int $userId,
+        ?string $search = null,
+        ?string $status = null,
+        ?string $dateFrom = null,
+        ?string $dateTo = null,
+        int $perPage = 15
+    ): LengthAwarePaginator {
+        $query = Invoice::query()
             ->whereHas('client', fn ($q) => $q->where('user_id', $userId))
-            ->with(['client', 'items', 'payments'])
-            ->latest('issue_date')
-            ->latest('id')
-            ->paginate(15);
+            ->with(['client', 'items', 'payments']);
+
+        // Search by invoice number or client name
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('invoice_number', 'LIKE', "%{$search}%")
+                  ->orWhereHas('client', function ($sub) use ($search) {
+                      $sub->where('name', 'LIKE', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filter by status
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        // Filter by issue date range
+        if ($dateFrom) {
+            $query->whereDate('issue_date', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $query->whereDate('issue_date', '<=', $dateTo);
+        }
+
+        return $query->latest('issue_date')->latest('id')->paginate($perPage);
     }
 
     public function find(Invoice $invoice): Invoice

@@ -2,19 +2,27 @@
 
 namespace App\Providers;
 
-use Illuminate\Auth\Notifications\ResetPassword;
-use Illuminate\Support\ServiceProvider;
+use App\Models\Client;
+use App\Models\Invoice;
+use App\Models\Payment;
+use App\Models\BusinessProfile;
+use App\Policies\ClientPolicy;
+use App\Policies\InvoicePolicy;
+use App\Policies\PaymentPolicy;
+use App\Policies\BusinessProfilePolicy;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
-class AppServiceProvider extends ServiceProvider
+class AuthServiceProvider extends ServiceProvider
 {
-    public function register(): void {}
+    protected $policies = [
+        Client::class => ClientPolicy::class,
+        Invoice::class => InvoicePolicy::class,
+        Payment::class => PaymentPolicy::class,
+        BusinessProfile::class => BusinessProfilePolicy::class,
+    ];
 
     public function boot(): void
     {
-        ResetPassword::createUrlUsing(function ($notifiable, string $token): string {
-            return rtrim((string) env('FRONTEND_URL', 'http://localhost:5173'), '/')
-                . '/reset-password/' . $token
-                . '?email=' . urlencode($notifiable->getEmailForPasswordReset());
-        });
+        $this->registerPolicies();
     }
 }

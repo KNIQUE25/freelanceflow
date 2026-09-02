@@ -98,29 +98,29 @@
           <!-- Workspace illustration -->
           <div class="absolute right-[-8%] top-[23%] hidden w-[57%] max-w-3xl rotate-[2deg] lg:block">
             <div class="rounded-[1.5rem] border-[10px] border-slate-800 bg-slate-900 p-2 shadow-2xl shadow-black/40">
-              <div class="overflow-hidden rounded-xl bg-white">
-                <div class="flex items-center justify-between border-b border-slate-100 px-5 py-3">
+              <div class="overflow-hidden rounded-xl bg-white dark:bg-slate-800">
+                <div class="flex items-center justify-between border-b border-slate-100 px-5 py-3 dark:border-slate-700">
                   <div class="flex items-center gap-2">
                     <span class="h-7 w-7 rounded-lg bg-primary-600"></span>
-                    <span class="text-xs font-bold text-slate-800">Invoices</span>
+                    <span class="text-xs font-bold text-slate-800 dark:text-white">Invoices</span>
                   </div>
-                  <span class="h-7 w-24 rounded-full bg-primary-50"></span>
+                  <span class="h-7 w-24 rounded-full bg-primary-50 dark:bg-slate-700"></span>
                 </div>
                 <div class="grid grid-cols-4 gap-3 p-4">
-                  <div v-for="stat in dashboardStats" :key="stat.label" class="rounded-xl bg-slate-50 p-3">
-                    <div class="mb-2 h-2 w-12 rounded-full bg-slate-200"></div>
-                    <div class="text-lg font-extrabold text-slate-800">{{ stat.value }}</div>
-                    <div class="mt-1 text-[9px] text-slate-400">{{ stat.label }}</div>
+                  <div v-for="stat in dashboardStats" :key="stat.label" class="rounded-xl bg-slate-50 p-3 dark:bg-slate-700/50">
+                    <div class="mb-2 h-2 w-12 rounded-full bg-slate-200 dark:bg-slate-600"></div>
+                    <div class="text-lg font-extrabold text-slate-800 dark:text-white">{{ stat.value }}</div>
+                    <div class="mt-1 text-[9px] text-slate-400 dark:text-slate-400">{{ stat.label }}</div>
                   </div>
                 </div>
-                <div class="mx-4 mb-4 overflow-hidden rounded-xl border border-slate-100">
-                  <div class="grid grid-cols-4 bg-slate-50 px-3 py-2 text-[9px] font-bold text-slate-400">
+                <div class="mx-4 mb-4 overflow-hidden rounded-xl border border-slate-100 dark:border-slate-700">
+                  <div class="grid grid-cols-4 bg-slate-50 px-3 py-2 text-[9px] font-bold text-slate-400 dark:bg-slate-800 dark:text-slate-500">
                     <span>Invoice</span><span>Client</span><span>Amount</span><span>Status</span>
                   </div>
-                  <div v-for="row in invoiceRows" :key="row.id" class="grid grid-cols-4 items-center border-t border-slate-100 px-3 py-3 text-[9px]">
-                    <span class="font-semibold text-slate-700">{{ row.id }}</span>
-                    <span class="text-slate-500">{{ row.client }}</span>
-                    <span class="font-semibold text-slate-700">{{ row.amount }}</span>
+                  <div v-for="row in invoiceRows" :key="row.id" class="grid grid-cols-4 items-center border-t border-slate-100 px-3 py-3 text-[9px] dark:border-slate-700">
+                    <span class="font-semibold text-slate-700 dark:text-white">{{ row.id }}</span>
+                    <span class="text-slate-500 dark:text-slate-400">{{ row.client }}</span>
+                    <span class="font-semibold text-slate-700 dark:text-white">{{ row.amount }}</span>
                     <span :class="statusClass(row.status)" class="w-fit rounded-full px-2 py-1 font-bold">{{ row.status }}</span>
                   </div>
                 </div>
@@ -135,6 +135,7 @@
                 Built for freelancers
               </div>
 
+              <!-- ✅ HERO HEADING – WHITE IN BOTH MODES -->
               <h1 class="text-4xl font-black leading-[1.03] tracking-tight text-white sm:text-5xl lg:text-6xl xl:text-7xl">
                 Manage Your Freelance Business
                 <span class="block bg-gradient-to-r from-primary-300 via-emerald-200 to-primary-400 bg-clip-text text-transparent">With Ease</span>
@@ -257,11 +258,11 @@
                   <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></svg>
                 </div>
                 <div v-if="feature.icon === 'users'" class="absolute bottom-7 right-8 h-24 w-32 rounded-2xl border-4 border-white bg-gradient-to-br from-amber-100 to-orange-200 shadow-xl"></div>
-                <div v-else-if="feature.icon === 'invoice'" class="absolute bottom-5 right-7 h-28 w-40 rounded-xl border border-slate-200 bg-white p-3 shadow-xl rotate-2">
+                <div v-else-if="feature.icon === 'invoice'" class="absolute bottom-5 right-7 h-28 w-40 rounded-xl border border-slate-200 bg-white p-3 shadow-xl rotate-2 dark:border-slate-700 dark:bg-slate-800">
                   <div class="h-2 w-20 rounded-full bg-primary-100"></div><div class="mt-3 h-2 w-full rounded-full bg-slate-100"></div><div class="mt-2 h-2 w-4/5 rounded-full bg-slate-100"></div><div class="mt-5 flex gap-2"><span class="h-8 flex-1 rounded-lg bg-primary-50"></span><span class="h-8 w-10 rounded-lg bg-emerald-50"></span></div>
                 </div>
-                <div v-else class="absolute bottom-5 right-10 h-32 w-20 rounded-[1.2rem] border-4 border-slate-800 bg-white shadow-xl">
-                  <div class="m-2 rounded-lg bg-emerald-50 p-2 text-center"><div class="text-[7px] font-bold text-emerald-700">M-PESA</div><div class="mt-4 text-[9px] font-black text-slate-800">KSh 25,000</div><div class="mt-4 rounded bg-emerald-500 py-1 text-[6px] font-bold text-white">Pay Now</div></div>
+                <div v-else class="absolute bottom-5 right-10 h-32 w-20 rounded-[1.2rem] border-4 border-slate-800 bg-white shadow-xl dark:border-slate-600 dark:bg-slate-700">
+                  <div class="m-2 rounded-lg bg-emerald-50 p-2 text-center dark:bg-emerald-900/30"><div class="text-[7px] font-bold text-emerald-700 dark:text-emerald-400">M-PESA</div><div class="mt-4 text-[9px] font-black text-slate-800 dark:text-white">KSh 25,000</div><div class="mt-4 rounded bg-emerald-500 py-1 text-[6px] font-bold text-white">Pay Now</div></div>
                 </div>
               </div>
               <div class="p-6">
@@ -275,7 +276,7 @@
       </section>
 
       <!-- =====================================================
-           FAQ SECTION (NEW)
+           FAQ SECTION
       ====================================================== -->
       <section id="faq" class="bg-white px-4 py-16 transition-colors duration-300 dark:bg-slate-950 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
         <div class="mx-auto max-w-3xl">
@@ -332,7 +333,7 @@
     </main>
 
     <!-- =====================================================
-         FOOTER – Updated with router-links
+         FOOTER
     ====================================================== -->
     <footer id="contact" class="border-t border-slate-200 bg-white px-4 py-12 transition-colors duration-300 dark:border-slate-800 dark:bg-slate-950 sm:px-6 lg:px-8">
       <div class="mx-auto grid max-w-[1440px] gap-10 lg:grid-cols-5">
@@ -526,6 +527,4 @@ button:focus-visible {
     scroll-behavior: smooth;
   }
 }
-
-/* Primary color overrides – already defined in main.css via Tailwind v3 */
 </style>

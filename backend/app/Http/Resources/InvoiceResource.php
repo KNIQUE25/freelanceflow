@@ -20,11 +20,9 @@ class InvoiceResource extends JsonResource
             'balance' => (float) ($this->total - $this->paid_amount),
             'status' => $this->status,
             'note' => $this->note,
-            'client' => new ClientResource($this->whenLoaded('client')),
             'items' => InvoiceItemResource::collection($this->whenLoaded('items')),
             'payments' => PaymentResource::collection($this->whenLoaded('payments')),
             'created_at' => $this->created_at?->toISOString(),
-            'updated_at' => $this->updated_at?->toISOString(),
         ];
     }
 }

@@ -3,43 +3,44 @@
 namespace App\Services;
 
 use App\Models\Client;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
 
 class ClientService
 {
-    public function __construct(private AuditService $audit) {}
-
-    public function getAllForUser(int $userId): LengthAwarePaginator
+    /**
+     * Get all clients for a user with optional search.
+     */
+    public function getAllForUser(int $userId, ?string $search = null, int $perPage = 15): LengthAwarePaginator
     {
-        return Client::query()
-            ->where('user_id', $userId)
-            ->withCount('invoices')
-            ->latest()
-            ->paginate(15);
+        $query = Client::where('user_id', $userId);
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('email', 'LIKE', "%{$search}%")
+                  ->orWhere('phone', 'LIKE', "%{$search}%")
+                  ->orWhere('company', 'LIKE', "%{$search}%");
+            });
+        }
+
+        return $query->latest()->paginate($perPage);
     }
 
-    public function create(int $userId, array $data): Client
+    public function create(array $data)
     {
-        $client = Client::create([...$data, 'user_id' => $userId]);
-        $this->audit->log('client.created', $client, null, $client->toArray(), $userId);
+        $data['user_id'] = Auth::id();
+        return Client::create($data);
+    }
+
+    public function update(Client $client, array $data)
+    {
+        $client->update($data);
         return $client;
     }
 
-    public function update(Client $client, array $data): Client
+    public function delete(Client $client)
     {
-        $old = $client->toArray();
-        $client->update($data);
-        $this->audit->log('client.updated', $client, $old, $client->fresh()->toArray());
-        return $client->refresh();
-    }
-
-    public function delete(Client $client): void
-    {
-        DB::transaction(function () use ($client) {
-            $old = $client->toArray();
-            $this->audit->log('client.deleted', $client, $old, null);
-            $client->delete();
-        });
+        $client->delete();
     }
 }
