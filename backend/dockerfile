@@ -31,7 +31,7 @@ RUN composer install \
     --prefer-dist
 
 # Install Node dependencies and build assets
-RUN npm ci && npm run build && rm -rf node_modules
+RUN npm install && npm run build && rm -rf node_modules
 
 # Fix permissions for Laravel storage/cache
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
