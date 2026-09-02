@@ -1,0 +1,19 @@
+# Exported from Render on 2026-07-24T13:06:21Z
+version: "1"
+projects:
+- name: My project
+  environments:
+  - name: Production
+    services:
+    - type: web
+      name: freelanceflow
+      runtime: docker
+      repo: https://github.com/KNIQUE25/freelanceflow
+      plan: free
+      envVars:
+      - key: render.yaml
+        sync: false
+      region: ohio
+      dockerContext: .
+      dockerfilePath: ./dockerfile
+      autoDeployTrigger: commit
