@@ -4,7 +4,7 @@ return [
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
     'allowed_methods' => ['*'],
     'allowed_origins' => array_values(array_filter([
-        env('FRONTEND_URL', 'https://freelanceflow-sandy.vercel.app/'),
+        env('FRONTEND_URL', 'http://localhost:5173'),
     ])),
     'allowed_origins_patterns' => [],
     'allowed_headers' => ['*'],
