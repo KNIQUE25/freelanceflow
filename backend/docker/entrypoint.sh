@@ -3,35 +3,28 @@ set -e
 
 echo "Starting Application..."
 
-# Ensure the views directory exists (fixes "View path not found")
-if [ ! -d "/var/www/resources/views" ]; then
-    mkdir -p /var/www/resources/views
-    echo "Created /var/www/resources/views"
-fi
+# Ensure Laravel directories exist
+mkdir -p /var/www/resources/views
+mkdir -p /var/www/storage
+mkdir -p /var/www/bootstrap/cache
 
-# Generate app key only if .env exists AND APP_KEY is empty
-if [ -z "$APP_KEY" ] && [ -f /var/www/.env ]; then
-    php artisan key:generate --force
-fi
+# Clear stale caches
+php artisan optimize:clear
 
-# Clear any stale caches (skip view:clear to avoid error)
-php artisan config:clear
-php artisan route:clear
-# php artisan view:clear   # <-- REMOVE this line
-
-# Run migrations (if database is ready)
+# Run database migrations
 php artisan migrate --force --no-interaction
 
-# Cache for performance (skip view:cache as well)
+# Cache configuration and routes
 php artisan config:cache
 php artisan route:cache
-# php artisan view:cache   # <-- REMOVE this line
 
-# Storage link
+# Create storage link
 php artisan storage:link 2>/dev/null || true
 
-# Fix permissions again (in case they changed)
+# Permissions
 chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 echo "Setup complete. Starting services..."
+
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf

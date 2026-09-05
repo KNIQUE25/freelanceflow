@@ -1,42 +1,37 @@
 FROM php:8.3-fpm
 
-# Install system dependencies (PHP extensions only)
 RUN apt-get update && apt-get install -y \
     git curl libpng-dev libonig-dev libxml2-dev \
     libpq-dev zip unzip nginx supervisor \
     && docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 
-# Copy application code
 COPY . .
 
-# ✅ Create the missing views directory
 RUN mkdir -p /var/www/resources/views
 
-# Set Composer memory limit
 ENV COMPOSER_MEMORY_LIMIT=-1
 
-# Install PHP dependencies
 RUN composer install \
     --no-dev \
     --no-interaction \
     --optimize-autoloader \
     --prefer-dist
 
-# Fix permissions for storage and cache
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-# Copy Nginx, Supervisor, and entrypoint
 COPY docker/nginx.conf /etc/nginx/sites-available/default
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/entrypoint.sh /entrypoint.sh
+
 RUN chmod +x /entrypoint.sh
 
 EXPOSE 80
+
 ENTRYPOINT ["/entrypoint.sh"]
