@@ -132,11 +132,11 @@ html.dark body {
 
 /* Fix for any white text without dark background in light mode */
 html:not(.dark) .text-white:not(.bg-primary-600):not(.bg-primary-700):not(.bg-slate-900):not(.bg-slate-950):not(.bg-indigo-600):not(.bg-indigo-700):not(.bg-red-600):not(.bg-emerald-600) {
-  color: #111827 !important;
+  color: #f0f0f1 !important;
 }
 
 html:not(.dark) .text-slate-100,
 html:not(.dark) .text-slate-200,
 html:not(.dark) .text-slate-300 {
-  color: #475569 !important;
+  color: #edeff1 !important;
 }
