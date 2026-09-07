@@ -64,3 +64,23 @@ Route::get('/invoices/{invoice}/public-url', [InvoiceController::class, 'publicU
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
 });
+
+Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index']);
+    Route::get('/users', [AdminUserController::class, 'index']);
+    Route::get('/users/{user}', [AdminUserController::class, 'show']);
+    Route::post('/users/{user}/suspend', [AdminUserController::class, 'suspend']);
+    Route::post('/users/{user}/activate', [AdminUserController::class, 'activate']);
+    Route::delete('/users/{user}', [AdminUserController::class, 'destroy']);
+
+    Route::get('/invoices', [AdminInvoiceController::class, 'index']);
+    Route::get('/invoices/{invoice}', [AdminInvoiceController::class, 'show']);
+
+    Route::get('/payments', [AdminPaymentController::class, 'index']);
+    Route::get('/payments/{payment}', [AdminPaymentController::class, 'show']);
+
+    Route::get('/audit-logs', [AdminAuditLogController::class, 'index']);
+
+    Route::get('/logs', [AdminSystemController::class, 'logs']);
+    Route::post('/clear-cache', [AdminSystemController::class, 'clearCache']);
+});
