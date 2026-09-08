@@ -73,12 +73,12 @@ html.dark input,
 html.dark textarea,
 html.dark select {
   background-color: #1e293b;
-  color: #f8fafc;
+  color: #272a2c;
   border-color: #475569;
 }
 html.dark input::placeholder,
 html.dark textarea::placeholder {
-  color: #94a3b8;
+  color: #e5e6e8;
 }
 html.dark select option {
   background: #1e293b;
