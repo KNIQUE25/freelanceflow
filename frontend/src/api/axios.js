@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+const API_URL = import.meta.env.VITE_API_URL
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL  || 'http://127.0.0.1:8000',
+    baseURL: `${API_URL}/api`,
     withCredentials: true,
     withXSRFToken: true,
     headers: {
@@ -9,5 +11,19 @@ const api = axios.create({
         'Content-Type': 'application/json',
     },
 })
+
+export const csrf = axios.create({
+    baseURL: API_URL,
+    withCredentials: true,
+    withXSRFToken: true,
+    headers: {
+        Accept: 'application/json',
+    },
+})
+
+export const initializeCsrf = async () => {
+    await csrf.get('/sanctum/csrf-cookie')
+}
+
 
 export default api
