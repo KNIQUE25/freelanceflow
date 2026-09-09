@@ -98,27 +98,83 @@ public function queryStatus(string $checkoutRequestId): array
     return $response->json();
 }
     public function handleCallback(array $payload): void
-    {
-        $body = $payload['Body']['stkCallback'] ?? null;
-        if (!$body) {
-            Log::warning('Invalid M-Pesa callback structure', ['payload' => $payload]);
-            return;
-        }
+{
+    Log::info('M-Pesa callback received', [
+        'payload' => $payload,
+    ]);
 
-        $checkoutRequestId = $body['CheckoutRequestID'] ?? null;
-        if (!$checkoutRequestId) return;
+    $body = $payload['Body']['stkCallback'] ?? null;
 
-        $payment = Payment::where('checkout_request_id', $checkoutRequestId)->first();
-        if (!$payment || $payment->status === 'completed') return;
-
-        $paymentService = app(PaymentService::class);
-        if ((int) ($body['ResultCode'] ?? 1) === 0) {
-            $receipt = collect($body['CallbackMetadata']['Item'] ?? [])->firstWhere('Name', 'MpesaReceiptNumber')['Value'] ?? null;
-            $paymentService->markAsCompleted($payment, $receipt);
-        } else {
-            $paymentService->markAsFailed($payment, $body['ResultDesc'] ?? 'M-Pesa payment failed.');
-        }
+    if (!$body) {
+        Log::warning('Invalid M-Pesa callback structure', [
+            'payload' => $payload,
+        ]);
+        return;
     }
+
+    $checkoutRequestId = $body['CheckoutRequestID'] ?? null;
+
+    if (!$checkoutRequestId) {
+        Log::warning('M-Pesa callback missing CheckoutRequestID', [
+            'callback' => $body,
+        ]);
+        return;
+    }
+
+    $payment = Payment::where(
+        'checkout_request_id',
+        $checkoutRequestId
+    )->first();
+
+    if (!$payment) {
+        Log::warning('M-Pesa callback payment not found', [
+            'checkout_request_id' => $checkoutRequestId,
+        ]);
+        return;
+    }
+
+    if ($payment->status === 'completed') {
+        Log::info('M-Pesa payment already completed', [
+            'payment_id' => $payment->id,
+        ]);
+        return;
+    }
+
+    $paymentService = app(PaymentService::class);
+
+    $resultCode = (int) ($body['ResultCode'] ?? 1);
+
+    if ($resultCode === 0) {
+
+        $receipt = collect(
+            $body['CallbackMetadata']['Item'] ?? []
+        )->firstWhere('Name', 'MpesaReceiptNumber')['Value'] ?? null;
+
+        Log::info('M-Pesa payment successful', [
+            'payment_id' => $payment->id,
+            'checkout_request_id' => $checkoutRequestId,
+            'receipt' => $receipt,
+        ]);
+
+        $paymentService->markAsCompleted(
+            $payment,
+            $receipt
+        );
+
+    } else {
+
+        Log::warning('M-Pesa payment failed or cancelled', [
+            'payment_id' => $payment->id,
+            'result_code' => $resultCode,
+            'result_desc' => $body['ResultDesc'] ?? null,
+        ]);
+
+        $paymentService->markAsFailed(
+            $payment,
+            $body['ResultDesc'] ?? 'M-Pesa payment failed.'
+        );
+    }
+}
 
     private function getAccessToken(): string
     {

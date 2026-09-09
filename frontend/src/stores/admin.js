@@ -1,101 +1,174 @@
-import { defineStore } from "pinia";
-import api from "@/services/api";
+import { defineStore } from 'pinia'
+import api from '@/services/api'
 
-export const useAdminStore = defineStore("admin", {
-  state: () => ({
-    stats: null,
-    users: { data: [], meta: {} },
-    user: null,
-    invoices: { data: [], meta: {} },
-    payments: { data: [], meta: {} },
-    logs: { data: [], meta: {} },
-    errorLogs: [],
-    loading: false,
-  }),
+export const useAdminStore = defineStore('admin', {
 
-  actions: {
-    async fetchStats() {
-      const res = await api.get("/admin/dashboard");
-      this.stats = res.data;
-      return res.data;
-    },
+    state: () => ({
 
-    async fetchUsers(params = {}) {
-      this.loading = true;
+        stats: null,
 
-      try {
-        const res = await api.get("/admin/users", { params });
-        this.users = res.data;
-      } finally {
-        this.loading = false;
-      }
-    },
+        users: {
+            data: [],
+            meta: {}
+        },
 
-    async fetchUser(id) {
-      const res = await api.get(`/admin/users/${id}`);
-      this.user = res.data;
-      return res.data;
-    },
+        user: null,
 
-    async suspendUser(id) {
-      await api.post(`/admin/users/${id}/suspend`);
-      await this.fetchUsers();
-    },
+        invoices: {
+            data: [],
+            meta: {}
+        },
 
-    async activateUser(id) {
-      await api.post(`/admin/users/${id}/activate`);
-      await this.fetchUsers();
-    },
+        payments: {
+            data: [],
+            meta: {}
+        },
 
-    async deleteUser(id) {
-      await api.delete(`/admin/users/${id}`);
-      await this.fetchUsers();
-    },
+        logs: {
+            data: [],
+            meta: {}
+        },
 
-    async fetchInvoices(params = {}) {
-      const res = await api.get("/admin/invoices", { params });
-      this.invoices = res.data;
-    },
+        errorLogs: [],
 
-    async fetchPayments(params = {}) {
-      const res = await api.get("/admin/payments", { params });
-      this.payments = res.data;
-    },
+        loading: false,
 
-    async fetchAuditLogs(params = {}) {
-      const res = await api.get("/admin/audit-logs", { params });
-      this.logs = res.data;
-    },
+    }),
 
-    async fetchErrorLogs() {
-      const res = await api.get("/admin/logs");
-      this.errorLogs = res.data.logs || [];
-    },
 
-    async clearCache() {
-      await api.post("/admin/clear-cache");
-    },
+    actions: {
 
-    // ✅ ADMIN LOGOUT
-    async logout() {
-      try {
-        await api.get("/sanctum/csrf-cookie");
-        await api.post("/logout");
+        async fetchStats() {
 
-        // Clear admin state
-        this.stats = null;
-        this.users = { data: [], meta: {} };
-        this.user = null;
-        this.invoices = { data: [], meta: {} };
-        this.payments = { data: [], meta: {} };
-        this.logs = { data: [], meta: {} };
-        this.errorLogs = [];
+            const response =
+                await api.get('/api/admin/dashboard')
 
-        return true;
-      } catch (error) {
-        console.error("Admin logout failed:", error);
-        throw error;
-      }
-    },
-  },
-});
+            this.stats = response.data
+
+            return response.data
+        },
+
+
+        async fetchUsers(params = {}) {
+
+            this.loading = true
+
+            try {
+
+                const response =
+                    await api.get(
+                        '/api/admin/users',
+                        { params }
+                    )
+
+                this.users = response.data
+
+            } finally {
+
+                this.loading = false
+
+            }
+        },
+
+
+        async fetchUser(id) {
+
+            const response =
+                await api.get(
+                    `/api/admin/users/${id}`
+                )
+
+            this.user = response.data
+
+            return response.data
+        },
+
+
+        async suspendUser(id) {
+
+            await api.post(
+                `/api/admin/users/${id}/suspend`
+            )
+
+            await this.fetchUsers()
+        },
+
+
+        async activateUser(id) {
+
+            await api.post(
+                `/api/admin/users/${id}/activate`
+            )
+
+            await this.fetchUsers()
+        },
+
+
+        async deleteUser(id) {
+
+            await api.delete(
+                `/api/admin/users/${id}`
+            )
+
+            await this.fetchUsers()
+        },
+
+
+        async fetchInvoices(params = {}) {
+
+            const response =
+                await api.get(
+                    '/api/admin/invoices',
+                    { params }
+                )
+
+            this.invoices = response.data
+        },
+
+
+        async fetchPayments(params = {}) {
+
+            const response =
+                await api.get(
+                    '/api/admin/payments',
+                    { params }
+                )
+
+            this.payments = response.data
+        },
+
+
+        async fetchAuditLogs(params = {}) {
+
+            const response =
+                await api.get(
+                    '/api/admin/audit-logs',
+                    { params }
+                )
+
+            this.logs = response.data
+        },
+
+
+        async fetchErrorLogs() {
+
+            const response =
+                await api.get(
+                    '/api/admin/logs'
+                )
+
+            this.errorLogs =
+                response.data.logs || []
+        },
+
+
+        async clearCache() {
+
+            await api.post(
+                '/api/admin/clear-cache'
+            )
+        }
+
+    }
+
+})

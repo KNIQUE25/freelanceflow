@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Services\PaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
@@ -59,25 +60,45 @@ public function verify(Payment $payment, MpesaService $mpesaService)
     }
 
     try {
-        $result = $mpesaService->queryStatus($payment->checkout_request_id);
+       $result = $mpesaService->queryStatus(
+    $payment->checkout_request_id
+);
 
-        // Check the result code from the response
-        $resultCode = $result['ResultCode'] ?? null;
+$resultCode = (string) ($result['ResultCode'] ?? '');
 
-        if ($resultCode === '0') {
-            // Payment completed – update status and invoice
-            $paymentService = app(PaymentService::class);
-            $paymentService->markAsCompleted($payment);
-            return response()->json(['message' => 'Payment verified and marked as completed.', 'status' => 'completed']);
-        } elseif ($resultCode === '1037') {
-            // Pending – still waiting for user to complete
-            return response()->json(['message' => 'Payment is still pending.', 'status' => 'pending']);
-        } else {
-            // Failed or cancelled
-            $paymentService = app(PaymentService::class);
-            $paymentService->markAsFailed($payment, $result['ResultDesc'] ?? 'Transaction failed');
-            return response()->json(['message' => 'Payment failed: ' . ($result['ResultDesc'] ?? 'Unknown error'), 'status' => 'failed']);
-        }
+if ($resultCode === '0') {
+
+    $paymentService = app(PaymentService::class);
+
+    $paymentService->markAsCompleted($payment);
+
+    return response()->json([
+        'message' => 'Payment verified and marked as completed.',
+        'status' => 'completed',
+    ]);
+
+} elseif ($resultCode === '1037') {
+
+    return response()->json([
+        'message' => 'Payment is still pending.',
+        'status' => 'pending',
+    ]);
+
+} else {
+
+    $paymentService = app(PaymentService::class);
+
+    $paymentService->markAsFailed(
+        $payment,
+        $result['ResultDesc'] ?? 'Transaction failed'
+    );
+
+    return response()->json([
+        'message' => 'Payment failed: ' .
+            ($result['ResultDesc'] ?? 'Unknown error'),
+        'status' => 'failed',
+    ]);
+}
     } catch (\Exception $e) {
         Log::error('Payment verification failed', ['payment_id' => $payment->id, 'error' => $e->getMessage()]);
         return response()->json(['message' => 'Error verifying payment: ' . $e->getMessage()], 500);

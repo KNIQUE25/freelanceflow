@@ -115,4 +115,16 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Contact Form Recipient
+    |--------------------------------------------------------------------------
+    |
+    | The inbox that receives messages submitted through the public Contact
+    | page. Falls back to the global "from" address if not set.
+    |
+    */
+
+    'contact_recipient' => env('MAIL_CONTACT_RECIPIENT'),
+
 ];

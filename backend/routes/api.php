@@ -1,94 +1,340 @@
 <?php
 
-use App\Http\Controllers\Admin\AdminAuditLogController;
-use App\Http\Controllers\Admin\AdminDashboardController;
-use App\Http\Controllers\Admin\AdminInvoiceController;
-use App\Http\Controllers\Admin\AdminPaymentController;
-use App\Http\Controllers\Admin\AdminSystemController;
-use App\Http\Controllers\Admin\AdminUserController;
-
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\BusinessProfileController;
-use App\Http\Controllers\ClientController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\MpesaController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\PublicInvoiceController;
-use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/ping', fn () => response()->json(['status' => 'connected']));
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\BusinessProfileController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\MpesaController;
+use App\Http\Controllers\PublicInvoiceController;
+
+// Admin controllers
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminInvoiceController;
+use App\Http\Controllers\Admin\AdminPaymentController;
+use App\Http\Controllers\Admin\AdminAuditLogController;
+use App\Http\Controllers\Admin\AdminSystemController;
+
+
+/*
+|--------------------------------------------------------------------------
+| Public authentication
+|--------------------------------------------------------------------------
+*/
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
-    ->name('verification.verify')
-    ->middleware(['signed', 'throttle:6,1']);
+    ->name('verification.verify');
+
+
+/*
+|--------------------------------------------------------------------------
+| Public invoice
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/public/invoice/{uuid}', [PublicInvoiceController::class, 'show']);
+Route::post('/public/invoice/{uuid}/pay', [PublicInvoiceController::class, 'pay']);
+Route::get('/public/invoice/{uuid}/status', [PublicInvoiceController::class, 'status']);
+
+
+/*
+|--------------------------------------------------------------------------
+| M-Pesa callbacks
+|--------------------------------------------------------------------------
+*/
 
 Route::post('/mpesa/callback', [MpesaController::class, 'callback']);
 
+
+/*
+|--------------------------------------------------------------------------
+| Authenticated user routes
+|--------------------------------------------------------------------------
+*/
+
 Route::middleware('auth:sanctum')->group(function () {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/user', [AuthController::class, 'user']);
+
     Route::post('/logout', [AuthController::class, 'logout']);
+
     Route::post('/email/resend', [AuthController::class, 'resendVerification']);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard
+    |--------------------------------------------------------------------------
+    */
 
     Route::get('/dashboard', [DashboardController::class, 'index']);
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Profile
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::put('/profile', [ProfileController::class, 'update']);
-    Route::post('/profile/change-password', [ProfileController::class, 'changePassword']);
     Route::delete('/profile', [ProfileController::class, 'destroy']);
+    Route::post('/profile/change-password', [ProfileController::class, 'changePassword']);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Business Profile
+    |--------------------------------------------------------------------------
+    */
 
     Route::get('/business-profile', [BusinessProfileController::class, 'index']);
     Route::post('/business-profile', [BusinessProfileController::class, 'store']);
-    Route::match(['put', 'post'], '/business-profile/{profile}', [BusinessProfileController::class, 'update']);
-    Route::delete('/business-profile/{profile}', [BusinessProfileController::class, 'destroy']);
+
+    Route::put('/business-profile/{profile}', [
+        BusinessProfileController::class,
+        'update'
+    ]);
+
+    Route::post('/business-profile/{profile}', [
+        BusinessProfileController::class,
+        'update'
+    ]);
+
+    Route::delete('/business-profile/{profile}', [
+        BusinessProfileController::class,
+        'destroy'
+    ]);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Clients
+    |--------------------------------------------------------------------------
+    */
 
     Route::apiResource('clients', ClientController::class);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Invoices
+    |--------------------------------------------------------------------------
+    */
+
     Route::apiResource('invoices', InvoiceController::class);
-    Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->middleware('auth:sanctum');
 
-    Route::get('/public/invoice/{uuid}', [PublicInvoiceController::class, 'show']);
-    Route::post('/payments/{payment}/verify', [PaymentController::class, 'verify']);
-Route::post('/public/invoice/{uuid}/pay', [PublicInvoiceController::class, 'pay']);
-Route::get('/public/invoice/{uuid}/status', [PublicInvoiceController::class, 'status']);
-Route::get('/invoices/{invoice}/public-url', [InvoiceController::class, 'publicUrl'])
-    ->middleware('auth:sanctum');
+    Route::get('/invoices/{invoice}/pdf', [
+        InvoiceController::class,
+        'pdf'
+    ]);
 
-    Route::apiResource('payments', PaymentController::class)->only(['index', 'store', 'show', 'destroy']);
-    Route::post('/mpesa/stk-push', [MpesaController::class, 'stkPush']);
+    Route::get('/invoices/{invoice}/public-url', [
+        InvoiceController::class,
+        'publicUrl'
+    ]);
 
-    Route::get('/reports/revenue', [ReportController::class, 'revenue']);
-    Route::get('/reports/invoice-status', [ReportController::class, 'invoiceStatus']);
-    Route::get('/reports/client-summary', [ReportController::class, 'clientSummary']);
-    Route::get('/reports/payment-methods', [ReportController::class, 'paymentMethods']);
 
-    Route::get('/notifications', [NotificationController::class, 'index']);
-    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
-    Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
-});
+    /*
+    |--------------------------------------------------------------------------
+    | Payments
+    |--------------------------------------------------------------------------
+    */
 
-Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', [AdminDashboardController::class, 'index']);
-    Route::get('/users', [AdminUserController::class, 'index']);
-    Route::get('/users/{user}', [AdminUserController::class, 'show']);
-    Route::post('/users/{user}/suspend', [AdminUserController::class, 'suspend']);
-    Route::post('/users/{user}/activate', [AdminUserController::class, 'activate']);
-    Route::delete('/users/{user}', [AdminUserController::class, 'destroy']);
+    Route::apiResource('payments', PaymentController::class)
+        ->only([
+            'index',
+            'store',
+            'show',
+            'destroy'
+        ]);
 
-    Route::get('/invoices', [AdminInvoiceController::class, 'index']);
-    Route::get('/invoices/{invoice}', [AdminInvoiceController::class, 'show']);
+    Route::post('/payments/{payment}/verify', [
+        PaymentController::class,
+        'verify'
+    ]);
 
-    Route::get('/payments', [AdminPaymentController::class, 'index']);
-    Route::get('/payments/{payment}', [AdminPaymentController::class, 'show']);
 
-    Route::get('/audit-logs', [AdminAuditLogController::class, 'index']);
+    /*
+    |--------------------------------------------------------------------------
+    | M-Pesa
+    |--------------------------------------------------------------------------
+    */
 
-    Route::get('/logs', [AdminSystemController::class, 'logs']);
-    Route::post('/clear-cache', [AdminSystemController::class, 'clearCache']);
+    Route::post('/mpesa/stk-push', [
+        MpesaController::class,
+        'stkPush'
+    ]);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Notifications
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/notifications', [
+        NotificationController::class,
+        'index'
+    ]);
+
+    Route::post('/notifications/read-all', [
+        NotificationController::class,
+        'markAllRead'
+    ]);
+
+    Route::post('/notifications/{id}/read', [
+        NotificationController::class,
+        'markAsRead'
+    ]);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reports
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/reports/client-summary', [
+        ReportController::class,
+        'clientSummary'
+    ]);
+
+    Route::get('/reports/invoice-status', [
+        ReportController::class,
+        'invoiceStatus'
+    ]);
+
+    Route::get('/reports/payment-methods', [
+        ReportController::class,
+        'paymentMethods'
+    ]);
+
+    Route::get('/reports/revenue', [
+        ReportController::class,
+        'revenue'
+    ]);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ADMIN ROUTES
+    |--------------------------------------------------------------------------
+    |
+    | These controllers are inside:
+    | app/Http/Controllers/Admin/
+    |
+    */
+
+    Route::prefix('admin')
+        ->middleware('admin')
+        ->group(function () {
+
+            /*
+            | Admin Dashboard
+            */
+            Route::get('/dashboard', [
+                AdminDashboardController::class,
+                'index'
+            ]);
+
+
+            /*
+            | Users
+            */
+            Route::get('/users', [
+                AdminUserController::class,
+                'index'
+            ]);
+
+            Route::get('/users/{user}', [
+                AdminUserController::class,
+                'show'
+            ]);
+
+            Route::delete('/users/{user}', [
+                AdminUserController::class,
+                'destroy'
+            ]);
+
+            Route::post('/users/{user}/activate', [
+                AdminUserController::class,
+                'activate'
+            ]);
+
+            Route::post('/users/{user}/suspend', [
+                AdminUserController::class,
+                'suspend'
+            ]);
+
+
+            /*
+            | Admin Invoices
+            */
+            Route::get('/invoices', [
+                AdminInvoiceController::class,
+                'index'
+            ]);
+
+            Route::get('/invoices/{invoice}', [
+                AdminInvoiceController::class,
+                'show'
+            ]);
+
+
+            /*
+            | Admin Payments
+            */
+            Route::get('/payments', [
+                AdminPaymentController::class,
+                'index'
+            ]);
+
+            Route::get('/payments/{payment}', [
+                AdminPaymentController::class,
+                'show'
+            ]);
+
+
+            /*
+            | Audit Logs
+            */
+            Route::get('/audit-logs', [
+                AdminAuditLogController::class,
+                'index'
+            ]);
+
+
+            /*
+            | System
+            */
+            Route::get('/logs', [
+                AdminSystemController::class,
+                'logs'
+            ]);
+
+            Route::post('/clear-cache', [
+                AdminSystemController::class,
+                'clearCache'
+            ]);
+        });
 });

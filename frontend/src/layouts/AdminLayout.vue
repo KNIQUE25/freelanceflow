@@ -1,173 +1,262 @@
 <template>
-  <div class="min-h-screen bg-gray-100 flex">
+  <div class="min-h-screen bg-slate-100 dark:bg-slate-950">
+
+    <!-- Mobile Header -->
+    <header
+      class="sticky top-0 z-40 flex h-16 items-center justify-between
+             border-b border-slate-200 bg-white px-4
+             dark:border-slate-800 dark:bg-slate-900
+             lg:hidden"
+    >
+
+      <button
+        @click="sidebarOpen = true"
+        class="rounded-lg p-2 text-slate-600 hover:bg-slate-100
+               dark:text-slate-300 dark:hover:bg-slate-800"
+      >
+        ☰
+      </button>
+
+      <div class="flex items-center gap-2">
+
+        <img
+          src="/ff-logo.png"
+          alt="FreelanceFlow"
+          class="h-9 w-9 rounded-lg"
+        />
+
+        <span class="font-black text-slate-900 dark:text-white">
+          Freelance<span class="text-primary-600">Flow</span>
+        </span>
+
+      </div>
+
+      <button
+        @click="handleLogout"
+        class="text-sm font-bold text-red-600"
+      >
+        Logout
+      </button>
+
+    </header>
+
+
+    <!-- Overlay -->
+    <div
+      v-if="sidebarOpen"
+      @click="sidebarOpen = false"
+      class="fixed inset-0 z-40 bg-black/50 lg:hidden"
+    ></div>
+
 
     <!-- Sidebar -->
     <aside
-      class="w-64 bg-gray-900 text-white fixed inset-y-0 left-0 z-50
-             transform transition-transform duration-300
-             lg:translate-x-0"
-      :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+      :class="[
+        'fixed inset-y-0 left-0 z-50 w-64 transform',
+        'border-r border-slate-200 bg-white',
+        'dark:border-slate-800 dark:bg-slate-900',
+        'transition-transform duration-200',
+        sidebarOpen
+          ? 'translate-x-0'
+          : '-translate-x-full',
+        'lg:translate-x-0'
+      ]"
     >
+
       <!-- Logo -->
-      <div class="h-16 flex items-center px-6 border-b border-gray-800">
-        <h1 class="text-xl font-bold text-blue-400">
-          FreelanceFlow
-        </h1>
+      <div
+        class="flex h-20 items-center gap-3 border-b
+               border-slate-200 px-6
+               dark:border-slate-800"
+      >
+
+        <img
+          src="/ff-logo.png"
+          alt="FreelanceFlow"
+          class="h-10 w-10 rounded-xl"
+        />
+
+        <div>
+          <div class="font-black text-slate-900 dark:text-white">
+            Freelance<span class="text-primary-600">Flow</span>
+          </div>
+
+          <div class="text-xs font-bold uppercase tracking-wider text-red-500">
+            Administration
+          </div>
+        </div>
+
       </div>
 
-      <!-- Admin label -->
-      <div class="px-6 py-4 border-b border-gray-800">
-        <p class="text-xs uppercase tracking-wider text-gray-400">
-          Administration
-        </p>
-
-        <p class="mt-1 font-semibold">
-          Admin Panel
-        </p>
-      </div>
 
       <!-- Navigation -->
-      <nav class="p-4 space-y-1">
+      <nav class="space-y-1 p-4">
 
         <RouterLink
           to="/admin/dashboard"
-          class="nav-link"
-          :class="{ 'nav-active': isActive('/admin/dashboard') }"
+          class="admin-nav"
+          @click="sidebarOpen = false"
         >
           <span>📊</span>
-          <span>Dashboard</span>
+          Dashboard
         </RouterLink>
 
         <RouterLink
           to="/admin/users"
-          class="nav-link"
-          :class="{ 'nav-active': isActive('/admin/users') }"
+          class="admin-nav"
+          @click="sidebarOpen = false"
         >
           <span>👥</span>
-          <span>Users</span>
+          Users
         </RouterLink>
 
         <RouterLink
           to="/admin/invoices"
-          class="nav-link"
-          :class="{ 'nav-active': isActive('/admin/invoices') }"
+          class="admin-nav"
+          @click="sidebarOpen = false"
         >
           <span>🧾</span>
-          <span>Invoices</span>
+          Invoices
         </RouterLink>
 
         <RouterLink
           to="/admin/payments"
-          class="nav-link"
-          :class="{ 'nav-active': isActive('/admin/payments') }"
+          class="admin-nav"
+          @click="sidebarOpen = false"
         >
           <span>💳</span>
-          <span>Payments</span>
+          Payments
         </RouterLink>
 
         <RouterLink
           to="/admin/audit-logs"
-          class="nav-link"
-          :class="{ 'nav-active': isActive('/admin/audit-logs') }"
+          class="admin-nav"
+          @click="sidebarOpen = false"
         >
           <span>📋</span>
-          <span>Audit Logs</span>
+          Audit Logs
         </RouterLink>
 
         <RouterLink
           to="/admin/errors"
-          class="nav-link"
-          :class="{ 'nav-active': isActive('/admin/errors') }"
+          class="admin-nav"
+          @click="sidebarOpen = false"
         >
           <span>⚠️</span>
-          <span>Error Logs</span>
+          Error Logs
         </RouterLink>
 
       </nav>
 
-      <!-- Bottom -->
-      <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
 
-        <RouterLink
-          to="/dashboard"
-          class="nav-link"
+      <!-- Bottom -->
+      <div
+        class="absolute bottom-0 left-0 right-0 border-t
+               border-slate-200 p-4
+               dark:border-slate-800"
+      >
+
+        <div
+          v-if="authStore.user"
+          class="mb-3 rounded-xl bg-slate-100 p-3
+                 dark:bg-slate-800"
         >
-          <span>↩️</span>
-          <span>Back to App</span>
-        </RouterLink>
+
+          <p class="truncate text-sm font-bold text-slate-900 dark:text-white">
+            {{ authStore.user.name }}
+          </p>
+
+          <p class="truncate text-xs text-slate-500">
+            {{ authStore.user.email }}
+          </p>
+
+          <span
+            class="mt-2 inline-block rounded-full
+                   bg-red-100 px-2 py-1 text-xs font-bold
+                   text-red-700 dark:bg-red-950 dark:text-red-300"
+          >
+            ADMIN
+          </span>
+
+        </div>
+
 
         <button
-          @click="logout"
-          :disabled="loggingOut"
-          class="nav-link w-full text-left text-red-400 hover:bg-red-900/30"
+          @click="handleLogout"
+          class="flex w-full items-center gap-3 rounded-xl
+                 px-4 py-3 text-left text-sm font-bold
+                 text-red-600 transition
+                 hover:bg-red-50
+                 dark:hover:bg-red-950/30"
         >
           <span>🚪</span>
-          <span>
-            {{ loggingOut ? 'Logging out...' : 'Logout' }}
-          </span>
+          Logout
         </button>
 
       </div>
+
     </aside>
 
-    <!-- Mobile overlay -->
-    <div
-      v-if="sidebarOpen"
-      @click="sidebarOpen = false"
-      class="fixed inset-0 bg-black/50 z-40 lg:hidden"
-    ></div>
 
     <!-- Main -->
-    <div class="flex-1 lg:ml-64 min-h-screen">
+    <div class="lg:pl-64">
 
-      <!-- Header -->
+      <!-- Desktop Header -->
       <header
-        class="h-16 bg-white border-b border-gray-200
-               flex items-center justify-between px-4 lg:px-6
-               sticky top-0 z-30"
+        class="hidden h-20 items-center justify-between
+               border-b border-slate-200 bg-white px-8
+               dark:border-slate-800 dark:bg-slate-900
+               lg:flex"
       >
 
-        <button
-          @click="sidebarOpen = !sidebarOpen"
-          class="lg:hidden text-gray-600 text-2xl"
-        >
-          ☰
-        </button>
+        <div>
 
-        <div class="hidden lg:block">
-          <h2 class="font-semibold text-gray-800">
+          <h1 class="text-xl font-black text-slate-900 dark:text-white">
             Admin Panel
-          </h2>
+          </h1>
+
+          <p class="text-sm text-slate-500">
+            Manage FreelanceFlow
+          </p>
+
         </div>
 
-        <!-- Admin user -->
-        <div class="flex items-center gap-3 ml-auto">
 
-          <div class="text-right hidden sm:block">
-            <p class="text-sm font-semibold text-gray-800">
-              {{ authStore.user?.name || 'Administrator' }}
+        <div class="flex items-center gap-4">
+
+          <div class="text-right">
+
+            <p class="text-sm font-bold text-slate-900 dark:text-white">
+              {{ authStore.user?.name }}
             </p>
 
-            <p class="text-xs text-gray-500">
-              {{ authStore.user?.email }}
+            <p class="text-xs text-slate-500">
+              Administrator
             </p>
+
           </div>
 
-          <div
-            class="w-10 h-10 rounded-full bg-blue-600
-                   text-white flex items-center justify-center
-                   font-bold"
+
+          <button
+            @click="handleLogout"
+            class="rounded-xl bg-red-50 px-4 py-2 text-sm
+                   font-bold text-red-600
+                   hover:bg-red-100
+                   dark:bg-red-950/30 dark:hover:bg-red-950/50"
           >
-            {{ initials }}
-          </div>
+            Logout
+          </button>
 
         </div>
 
       </header>
 
-      <!-- Page content -->
-      <main class="p-4 lg:p-6">
+
+      <!-- Page Content -->
+      <main class="p-4 sm:p-6 lg:p-8">
+
         <RouterView />
+
       </main>
 
     </div>
@@ -175,60 +264,58 @@
   </div>
 </template>
 
+
 <script setup>
-import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
-const route = useRoute()
 const router = useRouter()
+
 const authStore = useAuthStore()
 
 const sidebarOpen = ref(false)
-const loggingOut = ref(false)
 
-const initials = computed(() => {
-  const name = authStore.user?.name || 'Admin'
 
-  return name
-    .split(' ')
-    .map(word => word.charAt(0))
-    .join('')
-    .substring(0, 2)
-    .toUpperCase()
-})
+async function handleLogout() {
 
-const isActive = (path) => {
-  return route.path === path || route.path.startsWith(path + '/')
-}
+  const result = await authStore.logoutUser()
 
-const logout = async () => {
-  if (loggingOut.value) return
+  if (result.success || !authStore.isAuthenticated) {
 
-  loggingOut.value = true
+    sidebarOpen.value = false
 
-  try {
-    await authStore.logout()
-
-    await router.push({
+    await router.replace({
       name: 'login'
     })
-  } catch (error) {
-    console.error('Admin logout failed:', error)
-  } finally {
-    loggingOut.value = false
+
+  } else {
+
+    console.error(
+      'Logout failed:',
+      result.message
+    )
   }
 }
+
 </script>
 
+
 <style scoped>
-.nav-link {
-  @apply flex items-center gap-3 px-4 py-3 rounded-lg
-         text-gray-300 transition-colors duration-200
-         hover:bg-gray-800 hover:text-white;
+
+.admin-nav {
+  @apply flex items-center gap-3 rounded-xl px-4 py-3
+         text-sm font-semibold text-slate-600
+         transition
+         hover:bg-slate-100 hover:text-slate-900
+         dark:text-slate-300
+         dark:hover:bg-slate-800 dark:hover:text-white;
 }
 
-.nav-active {
-  @apply bg-blue-600 text-white hover:bg-blue-600;
+.admin-nav.router-link-active {
+  @apply bg-primary-50 text-primary-700
+         dark:bg-primary-950/40 dark:text-primary-400;
 }
+
 </style>

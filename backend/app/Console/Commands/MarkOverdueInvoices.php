@@ -14,11 +14,12 @@ class MarkOverdueInvoices extends Command
     public function handle(): int
     {
         $count = 0;
-        Invoice::query()->whereDate('due_date', '<', today())->whereIn('status', ['unpaid', 'partially_paid'])->with('client.user')->chunkById(100, function ($invoices) use (&$count) {
+        Invoice::query()->whereDate('due_date', '<', today())->whereIn('status', ['unpaid', 'partially_paid'])->with('client')->chunkById(100, function ($invoices) use (&$count) {
             foreach ($invoices as $invoice) {
                 $invoice->status = 'overdue';
                 $invoice->save();
-                $invoice->client?->user?->notify(new InvoiceOverdueNotification($invoice));
+                // Notify the client (who owes the money), not the freelancer who owns the record.
+                $invoice->client?->notify(new InvoiceOverdueNotification($invoice));
                 $count++;
             }
         });

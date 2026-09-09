@@ -10,7 +10,7 @@ return [
         ',',
         env(
             'SANCTUM_STATEFUL_DOMAINS',
-            'freelanceflow-sandy.vercel.app'
+            'localhost:5173,127.0.0.1:5173'
         )
     ),
 

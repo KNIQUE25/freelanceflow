@@ -1,53 +1,138 @@
 <template>
+
   <div>
-    <h2 class="text-2xl font-bold mb-6">Admin Dashboard</h2>
-    <div v-if="!stats" class="text-center py-8">Loading...</div>
+
+    <div class="mb-6">
+      <h2 class="text-2xl font-black text-slate-900 dark:text-white">
+        Admin Dashboard
+      </h2>
+
+      <p class="mt-1 text-sm text-slate-500">
+        Overview of your FreelanceFlow system.
+      </p>
+    </div>
+
+
+    <div
+      v-if="!store.stats"
+      class="rounded-2xl bg-white p-10 text-center shadow
+             dark:bg-slate-900"
+    >
+      Loading...
+    </div>
+
+
     <div v-else>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div v-for="(value, key) in statsCards" :key="key" class="bg-white p-4 rounded shadow">
-          <p class="text-sm text-gray-500">{{ key.replace('_', ' ') }}</p>
-          <p class="text-2xl font-bold">{{ value }}</p>
+
+      <div
+        class="mb-8 grid grid-cols-1 gap-4
+               md:grid-cols-2 lg:grid-cols-3"
+      >
+
+        <div
+          v-for="(value, key) in statsCards"
+          :key="key"
+          class="rounded-2xl border border-slate-200
+                 bg-white p-5 shadow-sm
+                 dark:border-slate-800 dark:bg-slate-900"
+        >
+
+          <p
+            class="text-sm font-semibold capitalize
+                   text-slate-500"
+          >
+            {{ key }}
+          </p>
+
+          <p
+            class="mt-2 text-2xl font-black
+                   text-slate-900 dark:text-white"
+          >
+            {{ value }}
+          </p>
+
         </div>
+
       </div>
 
-      <div class="bg-white p-4 rounded shadow">
-        <h3 class="font-bold mb-2">Quick Actions</h3>
-        <div class="flex gap-2 flex-wrap">
-          <button @click="clearCache" class="bg-yellow-500 text-white px-4 py-2 rounded">Clear Cache</button>
-          <button @click="refreshStats" class="bg-blue-500 text-white px-4 py-2 rounded">Refresh Stats</button>
+
+      <div
+        class="rounded-2xl border border-slate-200
+               bg-white p-6 shadow-sm
+               dark:border-slate-800 dark:bg-slate-900"
+      >
+
+        <h3 class="font-black text-slate-900 dark:text-white">
+          Quick Actions
+        </h3>
+
+        <div class="mt-4 flex flex-wrap gap-3">
+
+          <button
+            @click="clearCache"
+            class="rounded-xl bg-yellow-500 px-4 py-2
+                   text-sm font-bold text-white
+                   hover:bg-yellow-600"
+          >
+            Clear Cache
+          </button>
+
+          <button
+            @click="refreshStats"
+            class="rounded-xl bg-primary-600 px-4 py-2
+                   text-sm font-bold text-white
+                   hover:bg-primary-700"
+          >
+            Refresh Stats
+          </button>
+
         </div>
+
       </div>
+
     </div>
+
   </div>
+
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+
+import { computed, onMounted } from 'vue'
 import { useAdminStore } from '@/stores/admin'
 
 const store = useAdminStore()
-const stats = ref(null)
 
 const statsCards = computed(() => {
-  if (!stats.value) return {}
-  return {
-    'Total Users': stats.value.total_users,
-    'Total Invoices': stats.value.total_invoices,
-    'Total Payments': stats.value.total_payments,
-    'Total Revenue': 'KES ' + (stats.value.total_revenue || 0),
-    'Pending Invoices': stats.value.pending_invoices,
-    'Overdue Invoices': stats.value.overdue_invoices,
-  }
+
+    if (!store.stats) {
+        return {}
+    }
+
+    return {
+        'Total Users': store.stats.total_users,
+        'Total Invoices': store.stats.total_invoices,
+        'Total Payments': store.stats.total_payments,
+        'Total Revenue': 'KES ' + (store.stats.total_revenue || 0),
+        'Pending Invoices': store.stats.pending_invoices,
+        'Overdue Invoices': store.stats.overdue_invoices,
+    }
 })
 
-const refreshStats = async () => {
-  stats.value = await store.fetchStats()
+
+async function refreshStats() {
+    await store.fetchStats()
 }
 
-const clearCache = async () => {
-  await store.clearCache()
-  alert('Cache cleared!')
+
+async function clearCache() {
+
+    await store.clearCache()
+
+    alert('Cache cleared!')
 }
+
 
 onMounted(refreshStats)
+
 </script>

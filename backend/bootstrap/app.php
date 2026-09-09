@@ -13,21 +13,44 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+
     ->withMiddleware(function (Middleware $middleware): void {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Sanctum SPA Authentication
+        |--------------------------------------------------------------------------
+        */
         $middleware->statefulApi();
 
+        /*
+        |--------------------------------------------------------------------------
+        | Start Laravel sessions for API requests
+        |--------------------------------------------------------------------------
+        |
+        | AuthController uses Auth::attempt(), session()->regenerate(),
+        | logout(), etc. Therefore the API requests need a session.
+        |
+        */
+        $middleware->appendToGroup('api', [
+            StartSession::class,
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Admin Middleware
+        |--------------------------------------------------------------------------
+        */
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
         ]);
-
-        $middleware->api(append: [
-            StartSession::class,
-        ]);
     })
+
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) =>
                 $request->is('api/*') || $request->expectsJson()
         );
     })
+
     ->create();
