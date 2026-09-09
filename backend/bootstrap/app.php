@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -21,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         | Sanctum SPA Authentication
         |--------------------------------------------------------------------------
         */
+
         $middleware->statefulApi();
 
         /*
@@ -28,18 +28,33 @@ return Application::configure(basePath: dirname(__DIR__))
         | Admin Middleware
         |--------------------------------------------------------------------------
         */
+
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
         ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Authentication redirect
+        |--------------------------------------------------------------------------
+        */
+
+        $middleware->redirectGuestsTo(function (Request $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return null;
+            }
+
+            return config('app.frontend_url', '/');
+        });
     })
 
-    ->withExceptions(function (Exceptions $exceptions): void {
+    ->withExceptions(function (Exceptions $exceptions) {
 
         $exceptions->render(function (
-            AuthenticationException $e,
+            \Illuminate\Auth\AuthenticationException $e,
             Request $request
         ) {
-            if ($request->is('api/*') || $request->expectsJson()) {
+            if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json([
                     'message' => 'Unauthenticated.',
                 ], 401);
