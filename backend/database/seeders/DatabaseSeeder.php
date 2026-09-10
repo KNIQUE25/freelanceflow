@@ -14,34 +14,29 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Admin
-        User::updateOrCreate(
-            ['email' => 'admin@freelanceflow.com'],
+        $this->call(AdminUserSeeder::class);
+
+        // Demo freelancer
+        $user = User::updateOrCreate(
+            ['email' => 'test@example.com'],
             [
-                'name' => 'FreelanceFlow Admin',
+                'name' => 'Demo Freelancer',
                 'email_verified_at' => now(),
-                'password' => Hash::make('Admin@12345'),
-                'role' => 'admin',
+                'password' => Hash::make('password'),
+                'role' => 'freelancer',
             ]
         );
 
-        // Demo freelancer
-        $user = User::factory()->create([
-            'name' => 'Demo Freelancer',
-            'email' => 'test@example.com',
-            'email_verified_at' => now(),
-            'password' => Hash::make('password'),
-            'role' => 'freelancer',
-        ]);
-
-        BusinessProfile::create([
-            'user_id' => $user->id,
-            'business_name' => 'Demo Freelance Studio',
-            'email' => $user->email,
-            'phone' => '0712345678',
-            'address' => 'Nairobi, Kenya',
-            'currency' => 'KES',
-        ]);
+        BusinessProfile::updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'business_name' => 'Demo Freelance Studio',
+                'email' => $user->email,
+                'phone' => '0712345678',
+                'address' => 'Nairobi, Kenya',
+                'currency' => 'KES',
+            ]
+        );
 
         for ($i = 1; $i <= 5; $i++) {
             $client = Client::factory()->create([
