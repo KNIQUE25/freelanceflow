@@ -9,6 +9,18 @@ export const useClientsStore = defineStore('clients', {
     isLoading: false,
   }),
   actions: {
+    getErrorMessage(error) {
+      const response = error.response
+      const validationErrors = response?.data?.errors
+      const firstValidationError = validationErrors
+        ? Object.values(validationErrors)[0]
+        : null
+
+      return Array.isArray(firstValidationError)
+        ? firstValidationError[0]
+        : response?.data?.message || 'Unable to save client.'
+    },
+
     async fetchClients(params = {}) {
       this.isLoading = true
       try {
@@ -17,7 +29,7 @@ export const useClientsStore = defineStore('clients', {
         this.meta = meta
         return { success: true, data }
       } catch (error) {
-        return { success: false, message: error.response?.data?.message }
+        return { success: false, message: this.getErrorMessage(error) }
       } finally {
         this.isLoading = false
       }
@@ -29,7 +41,7 @@ export const useClientsStore = defineStore('clients', {
         this.client = data
         return { success: true, data }
       } catch (error) {
-        return { success: false, message: error.response?.data?.message }
+        return { success: false, message: this.getErrorMessage(error) }
       } finally {
         this.isLoading = false
       }
@@ -39,7 +51,7 @@ export const useClientsStore = defineStore('clients', {
         const response = await createClient(data)
         return { success: true, data: response }
       } catch (error) {
-        return { success: false, message: error.response?.data?.message }
+        return { success: false, message: this.getErrorMessage(error) }
       }
     },
     async update(id, data) {
@@ -47,7 +59,7 @@ export const useClientsStore = defineStore('clients', {
         const response = await updateClient(id, data)
         return { success: true, data: response }
       } catch (error) {
-        return { success: false, message: error.response?.data?.message }
+        return { success: false, message: this.getErrorMessage(error) }
       }
     },
     async delete(id) {
@@ -55,7 +67,7 @@ export const useClientsStore = defineStore('clients', {
         await deleteClient(id)
         return { success: true }
       } catch (error) {
-        return { success: false, message: error.response?.data?.message }
+        return { success: false, message: this.getErrorMessage(error) }
       }
     },
   },

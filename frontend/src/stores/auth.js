@@ -24,7 +24,7 @@ export const useAuthStore = defineStore('auth', {
         },
 
         isAdmin: (state) => {
-            return state.user?.role === 'admin'
+            return String(state.user?.role || '').trim().toLowerCase() === 'admin'
         },
 
     },
