@@ -61,11 +61,6 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword'])
 Route::post('/contact', [ContactController::class, 'send'])
     ->middleware('throttle:5,1');
 
-Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
-    ->middleware(['signed', 'throttle:6,1'])
-    ->name('verification.verify');
-
-
 /*
 |--------------------------------------------------------------------------
 | Public invoice
@@ -92,7 +87,7 @@ Route::post('/mpesa/callback', [MpesaController::class, 'callback']);
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
@@ -100,16 +95,9 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/user', [AuthController::class, 'user'])
-        ->withoutMiddleware('verified');
+    Route::get('/user', [AuthController::class, 'user']);
 
-    Route::post('/logout', [AuthController::class, 'logout'])
-        ->withoutMiddleware('verified');
-
-    Route::post('/email/resend', [AuthController::class, 'resendVerification'])
-        ->withoutMiddleware('verified')
-        ->middleware('throttle:6,1');
-
+    Route::post('/logout', [AuthController::class, 'logout']);
 
     /*
     |--------------------------------------------------------------------------

@@ -53,10 +53,3 @@ export async function resetPassword(data) {
 
     return response.data
 }
-
-export async function resendVerification() {
-    await getCsrfCookie()
-    const response = await api.post('/api/email/resend')
-
-    return response.data
-}

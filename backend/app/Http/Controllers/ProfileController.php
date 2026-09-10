@@ -19,9 +19,7 @@ class ProfileController extends Controller
     {
         $user = auth()->user();
         $data = $request->validated();
-        $emailChanged = isset($data['email']) && $data['email'] !== $user->email;
         $user->fill($data);
-        if ($emailChanged) $user->email_verified_at = null;
         $user->save();
         return response()->json(['user' => $user->fresh()->load('businessProfile')]);
     }

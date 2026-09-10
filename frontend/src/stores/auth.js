@@ -6,8 +6,7 @@ import {
     logout,
     getUser,
     forgotPassword,
-    resetPassword,
-    resendVerification
+    resetPassword
 } from '@/services/auth'
 
 export const useAuthStore = defineStore('auth', {
@@ -28,9 +27,6 @@ export const useAuthStore = defineStore('auth', {
             return state.user?.role === 'admin'
         },
 
-        isEmailVerified: (state) => {
-            return !!state.user?.email_verified_at
-        },
     },
 
     actions: {
@@ -214,26 +210,6 @@ export const useAuthStore = defineStore('auth', {
         },
 
 
-        async resendVerification() {
-
-            try {
-
-                const response =
-                    await resendVerification()
-
-                return {
-                    success: true,
-                    message: response.message
-                }
-
-            } catch (error) {
-
-                return {
-                    success: false,
-                    message: this.getErrorMessage(error)
-                }
-            }
-        },
 
 
         async register(data) {

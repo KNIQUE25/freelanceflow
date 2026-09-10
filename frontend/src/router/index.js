@@ -35,9 +35,6 @@ const ForgotPassword = () =>
 const ResetPassword = () =>
     import('../views/Auth/ResetPassword.vue')
 
-const EmailVerificationSuccess = () =>
-    import('../views/Auth/EmailVerificationSuccess.vue')
-
 
 // =====================================================
 // USER LAYOUT
@@ -83,9 +80,6 @@ const Notifications = () =>
 
 const Reports = () =>
     import('../views/Reports.vue')
-
-const VerifyEmail = () =>
-    import('../views/VerifyEmail.vue')
 
 const PublicInvoice = () =>
     import('../views/PublicInvoice.vue')
@@ -254,14 +248,6 @@ const routes = [
                 }
             },
 
-            {
-                path: 'email/verification-success',
-                name: 'email-verification-success',
-                component: EmailVerificationSuccess,
-                meta: {
-                    guest: true
-                }
-            }
         ]
     },
 
@@ -303,16 +289,6 @@ const routes = [
                 path: 'dashboard',
                 name: 'dashboard',
                 component: Dashboard
-            },
-
-            {
-                path: 'email/verify',
-                name: 'email-verify',
-                component: VerifyEmail,
-
-                meta: {
-                    ignoreVerification: true
-                }
             },
 
             {
@@ -567,17 +543,6 @@ router.beforeEach(async (to) => {
                 name: 'dashboard'
             }
         }
-    }
-
-    // Unverified users must complete verification before using the app.
-    // Keep the verification screen itself accessible so they can resend mail.
-    if (
-        authStore.isAuthenticated &&
-        !authStore.isEmailVerified &&
-        to.name !== 'email-verify' &&
-        !to.meta.ignoreVerification
-    ) {
-        return { name: 'email-verify' }
     }
 
 

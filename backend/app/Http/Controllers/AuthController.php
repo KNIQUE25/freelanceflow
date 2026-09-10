@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,9 +23,8 @@ class AuthController extends Controller
         'name' => $validated['name'],
         'email' => $validated['email'],
         'password' => $validated['password'],
+        'email_verified_at' => now(),
     ]);
-
-    event(new Registered($user));
 
     Auth::login($user);
     $request->session()->regenerate();
@@ -123,69 +121,6 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Password reset successfully.'
         ]);
-    }
-
-    public function resendVerification(Request $request): JsonResponse
-    {
-        $user = $request->user();
-
-        if (!$user) {
-            return response()->json([
-                'message' => 'Unauthenticated.'
-            ], 401);
-        }
-
-        if ($user->hasVerifiedEmail()) {
-            return response()->json([
-                'message' => 'Email already verified.'
-            ], 400);
-        }
-
-        $user->sendEmailVerificationNotification();
-
-        return response()->json([
-            'message' => 'Verification link sent.'
-        ]);
-    }
-
-    public function verifyEmail(
-        Request $request,
-        string $id,
-        string $hash
-    ): JsonResponse {
-
-        $user = User::findOrFail($id);
-
-        if (!hash_equals(
-            sha1($user->getEmailForVerification()),
-            $hash
-        )) {
-            return redirect()->to(
-                rtrim(
-                    (string) env(
-                        'FRONTEND_URL',
-                        'http://localhost:5173'
-                    ),
-                    '/'
-                ) .
-                '/email/verification-success?verified=0'
-            );
-        }
-
-        if (!$user->hasVerifiedEmail()) {
-            $user->markEmailAsVerified();
-        }
-
-        return redirect()->to(
-            rtrim(
-                (string) env(
-                    'FRONTEND_URL',
-                    'http://localhost:5173'
-                ),
-                '/'
-            ) .
-            '/email/verification-success?verified=1'
-        );
     }
 
     private function userResponse(
