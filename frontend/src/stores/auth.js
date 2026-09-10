@@ -104,8 +104,9 @@ export const useAuthStore = defineStore('auth', {
                 }
 
             } catch (error) {
-
-                this.user = null
+                if (error.response?.status === 401) {
+                    this.user = null
+                }
 
                 return {
                     success: false,
