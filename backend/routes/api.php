@@ -33,6 +33,17 @@ use App\Http\Controllers\Admin\AdminSystemController;
 */
 
 Route::get('/csrf-token', function () {
+    if (
+        app()->environment('production')
+        || str_starts_with((string) config('app.url'), 'https://')
+        || request()->isSecure()
+    ) {
+        config([
+            'session.secure' => true,
+            'session.same_site' => 'none',
+        ]);
+    }
+
     $token = csrf_token();
     $encrypter = app('encrypter');
 
