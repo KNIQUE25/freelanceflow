@@ -1,4 +1,5 @@
 import api from './api'
+import { withCsrfRecovery } from './auth'
 
 export async function getNotifications() {
   const response = await api.get('/api/notifications')
@@ -6,11 +7,15 @@ export async function getNotifications() {
 }
 
 export async function markAsRead(id) {
-  const response = await api.post(`/api/notifications/${id}/read`)
+  const response = await withCsrfRecovery(() =>
+    api.post(`/api/notifications/${id}/read`)
+  )
   return response.data
 }
 
 export async function markAllRead() {
-  const response = await api.post('/api/notifications/read-all')
+  const response = await withCsrfRecovery(() =>
+    api.post('/api/notifications/read-all')
+  )
   return response.data
 }
