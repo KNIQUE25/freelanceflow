@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import api from '@/services/api'
+import { getCsrfCookie } from '@/services/auth'
 
 export const useAdminStore = defineStore('admin', {
 
@@ -86,6 +87,7 @@ export const useAdminStore = defineStore('admin', {
 
         async suspendUser(id) {
 
+            await getCsrfCookie()
             await api.post(
                 `/api/admin/users/${id}/suspend`
             )
@@ -96,6 +98,7 @@ export const useAdminStore = defineStore('admin', {
 
         async activateUser(id) {
 
+            await getCsrfCookie()
             await api.post(
                 `/api/admin/users/${id}/activate`
             )
@@ -106,6 +109,7 @@ export const useAdminStore = defineStore('admin', {
 
         async deleteUser(id) {
 
+            await getCsrfCookie()
             await api.delete(
                 `/api/admin/users/${id}`
             )
@@ -164,6 +168,7 @@ export const useAdminStore = defineStore('admin', {
 
         async clearCache() {
 
+            await getCsrfCookie()
             await api.post(
                 '/api/admin/clear-cache'
             )
