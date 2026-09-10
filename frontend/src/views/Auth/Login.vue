@@ -147,7 +147,7 @@ async function handleLogin() {
 
   if (result.success) {
     // ADMIN
-    if (authStore.user?.role === 'admin') {
+    if (authStore.isAdmin) {
       await router.push({ name: 'admin-dashboard' })
     } 
     // NORMAL USER
