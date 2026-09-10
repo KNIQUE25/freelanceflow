@@ -7,13 +7,15 @@
         <td class="p-3 text-sm text-slate-600">{{ client.phone || '-' }}</td>
         <td class="p-3 text-sm text-slate-600">{{ client.company || '-' }}</td>
         <td class="p-3 text-sm text-slate-600">{{ client.invoices_count ?? 0 }}</td>
-        <td class="p-3"><div class="flex gap-3 text-sm"><router-link :to="`/clients/${client.id}`" class="font-semibold text-primary-600">View</router-link><router-link :to="`/clients/${client.id}/edit`" class="font-semibold text-emerald-600">Edit</router-link><button class="font-semibold text-red-600" @click="handleDelete(client.id)">Delete</button></div></td>
+        <td class="p-3"><div class="flex gap-3 text-sm"><router-link :to="`/clients/${client.id}`" class="font-semibold text-primary-600">View</router-link><router-link :to="`/clients/${client.id}/edit`" class="font-semibold text-emerald-600">Edit</router-link><a v-if="getWhatsAppUrl(client.phone)" :href="getWhatsAppUrl(client.phone)" target="_blank" rel="noopener noreferrer" class="font-semibold text-green-600">WhatsApp</a><button class="font-semibold text-red-600" @click="handleDelete(client.id)">Delete</button></div></td>
       </tr>
     </tbody>
   </table>
 </template>
 
 <script setup>
+import { getWhatsAppUrl } from '../utils/whatsapp'
+
 defineProps({ clients: { type: Array, required: true } })
 const emit = defineEmits(['delete-client'])
 const headers = ['Client', 'Phone', 'Company', 'Invoices', 'Actions']
