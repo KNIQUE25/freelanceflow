@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "https://freelanceflow-v0lv.onrender.com/api/:path*"
+    },
+    {
+      "source": "/sanctum/:path*",
+      "destination": "https://freelanceflow-v0lv.onrender.com/sanctum/:path*"
+    },
+    {
       "source": "/((?!api(?:/|$)|sanctum(?:/|$)).*)",
       "destination": "/index.html"
     }
