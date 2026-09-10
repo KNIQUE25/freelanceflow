@@ -438,6 +438,18 @@ const routes = [
         ]
     },
 
+    // Keep older admin links working after the dashboard route was renamed.
+    {
+        path: '/admin/admin-dashboard',
+        redirect: {
+            name: 'admin-dashboard'
+        },
+        meta: {
+            requiresAuth: true,
+            admin: true
+        }
+    },
+
 
     // -------------------------------------------------
     // 404
