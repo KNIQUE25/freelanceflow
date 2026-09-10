@@ -29,7 +29,10 @@ class AdminUserSeeder extends Seeder
             ]
         );
 
-        if ($admin->wasRecentlyCreated) {
+        if (
+            $admin->wasRecentlyCreated
+            || !Hash::check($password, (string) $admin->password)
+        ) {
             $admin->forceFill([
                 'password' => Hash::make($password),
             ])->save();
