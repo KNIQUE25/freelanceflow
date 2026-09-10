@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Str;
 
+$productionCookies = env('APP_ENV') === 'production'
+    || str_starts_with((string) env('APP_URL'), 'https://');
+
 return [
 
     /*
@@ -169,7 +172,7 @@ return [
     |
     */
 
-    'secure' => env('APP_ENV') === 'production'
+    'secure' => $productionCookies
         ? true
         : env('SESSION_SECURE_COOKIE', false),
 
@@ -201,7 +204,7 @@ return [
     |
     */
 
-    'same_site' => env('APP_ENV') === 'production'
+    'same_site' => $productionCookies
         ? 'none'
         : env('SESSION_SAME_SITE', 'lax'),
 

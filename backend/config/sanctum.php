@@ -10,7 +10,7 @@ return [
         ',',
         env(
             'SANCTUM_STATEFUL_DOMAINS',
-            'localhost:5173,127.0.0.1:5173'
+            'localhost:5173,127.0.0.1:5173,localhost,127.0.0.1,freelanceflow-one-gilt.vercel.app'
         )
     ),
 

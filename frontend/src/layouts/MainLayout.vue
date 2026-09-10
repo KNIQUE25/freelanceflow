@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-slate-50 dark:bg-slate-950 lg:flex">
     <Sidebar :open="sidebarOpen" @close="sidebarOpen = false" />
     <div class="min-w-0 flex-1">
-      <Navbar @menu="sidebarOpen = !sidebarOpen" />
+      <Navbar @toggle-sidebar="sidebarOpen = !sidebarOpen" />
       <main class="min-h-[calc(100vh-64px)] p-4 sm:p-6 lg:p-8">
         <router-view />
       </main>
