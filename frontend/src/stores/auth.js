@@ -75,20 +75,12 @@ export const useAuthStore = defineStore('auth', {
 
                 this.user = response.user
 
-                console.log('Logged in user:', this.user)
-
                 return {
                     success: true,
                     data: response
                 }
 
             } catch (error) {
-
-                console.error(
-                    'LOGIN ERROR:',
-                    error.response || error
-                )
-
                 return {
                     success: false,
                     message: this.getErrorMessage(error),

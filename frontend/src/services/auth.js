@@ -30,6 +30,7 @@ export async function getUser() {
 }
 
 export async function logout() {
+    await getCsrfCookie()
     const response = await api.post('/api/logout')
 
     return response.data
@@ -54,6 +55,7 @@ export async function resetPassword(data) {
 }
 
 export async function resendVerification() {
+    await getCsrfCookie()
     const response = await api.post('/api/email/resend')
 
     return response.data

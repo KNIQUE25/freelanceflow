@@ -3,7 +3,8 @@ import axios from 'axios';
 let csrfToken = null;
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
+    // In development Vite proxies API requests; production uses the configured API origin.
+    baseURL: import.meta.env.VITE_API_URL || '',
     withCredentials: true,
     withXSRFToken: true,
 });

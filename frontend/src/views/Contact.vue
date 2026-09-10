@@ -17,22 +17,22 @@
       </div>
       <form @submit.prevent="submit" class="space-y-6">
         <div>
-          <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200">Full Name</label>
-          <input type="text" v-model="form.name" required class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white" />
+          <label for="contact-name" class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200">Full Name</label>
+          <input id="contact-name" name="name" type="text" autocomplete="name" v-model="form.name" required class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white" />
         </div>
         <div>
-          <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200">Email</label>
-          <input type="email" v-model="form.email" required class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white" />
+          <label for="contact-email" class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200">Email</label>
+          <input id="contact-email" name="email" type="email" autocomplete="email" v-model="form.email" required class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white" />
         </div>
         <div>
-          <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200">Message</label>
-          <textarea rows="5" v-model="form.message" required class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"></textarea>
+          <label for="contact-message" class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200">Message</label>
+          <textarea id="contact-message" name="message" rows="5" v-model="form.message" required class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"></textarea>
         </div>
         <button type="submit" :disabled="sending" class="w-full rounded-xl bg-primary-600 px-6 py-3.5 font-semibold text-white shadow-lg shadow-primary-600/20 transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60">
           {{ sending ? 'Sending…' : 'Send Message' }}
         </button>
-        <div v-if="submitted" class="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 dark:border-green-900/50 dark:bg-green-950/40 dark:text-green-300">Message sent successfully!</div>
-        <div v-if="error" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300">{{ error }}</div>
+        <div v-if="submitted" role="status" aria-live="polite" class="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 dark:border-green-900/50 dark:bg-green-950/40 dark:text-green-300">Message sent successfully!</div>
+        <div v-if="error" role="alert" aria-live="assertive" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300">{{ error }}</div>
       </form>
     </main>
     <footer class="border-t border-slate-200 bg-slate-50 py-8 dark:border-slate-800 dark:bg-slate-900">

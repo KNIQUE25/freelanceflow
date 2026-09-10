@@ -29,6 +29,7 @@ class AuthController extends Controller
     event(new Registered($user));
 
     Auth::login($user);
+    $request->session()->regenerate();
 
     return $this->userResponse(
         $user,
@@ -49,6 +50,7 @@ class AuthController extends Controller
         ]);
     }
 
+    $request->session()->regenerate();
     $user = Auth::user();
 
     return $this->userResponse(
@@ -67,6 +69,8 @@ class AuthController extends Controller
    public function logout(Request $request): JsonResponse
 {
     Auth::guard('web')->logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
 
     return response()->json([
         'message' => 'Logged out successfully.'
@@ -82,12 +86,6 @@ class AuthController extends Controller
         $status = Password::sendResetLink(
             $request->only('email')
         );
-
-        if ($status !== Password::RESET_LINK_SENT) {
-            throw ValidationException::withMessages([
-                'email' => [__($status)]
-            ]);
-        }
 
         return response()->json([
             'message' => 'Password reset link sent to your email.'

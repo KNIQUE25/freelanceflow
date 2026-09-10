@@ -569,6 +569,17 @@ router.beforeEach(async (to) => {
         }
     }
 
+    // Unverified users must complete verification before using the app.
+    // Keep the verification screen itself accessible so they can resend mail.
+    if (
+        authStore.isAuthenticated &&
+        !authStore.isEmailVerified &&
+        to.name !== 'email-verify' &&
+        !to.meta.ignoreVerification
+    ) {
+        return { name: 'email-verify' }
+    }
+
 
     // -------------------------------------------------
     // Prevent logged-in users from login/register

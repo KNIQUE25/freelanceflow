@@ -15,6 +15,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\MpesaController;
 use App\Http\Controllers\PublicInvoiceController;
+use App\Http\Controllers\ContactController;
 
 // Admin controllers
 use App\Http\Controllers\Admin\AdminDashboardController;
@@ -44,16 +45,24 @@ Route::get('/csrf-token', function () {
 })->name('csrf.token');
 
 Route::post('/register', [AuthController::class, 'register'])
+    ->middleware('throttle:10,1')
     ->name('register');
 
 Route::post('/login', [AuthController::class, 'login'])
+    ->middleware('throttle:5,1')
     ->name('login');
 
-Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])
+    ->middleware('throttle:5,1');
 
-Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])
+    ->middleware('throttle:5,1');
+
+Route::post('/contact', [ContactController::class, 'send'])
+    ->middleware('throttle:5,1');
 
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+    ->middleware(['signed', 'throttle:6,1'])
     ->name('verification.verify');
 
 
@@ -83,7 +92,7 @@ Route::post('/mpesa/callback', [MpesaController::class, 'callback']);
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
@@ -91,11 +100,15 @@ Route::middleware('auth:sanctum')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/user', [AuthController::class, 'user']);
+    Route::get('/user', [AuthController::class, 'user'])
+        ->withoutMiddleware('verified');
 
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/logout', [AuthController::class, 'logout'])
+        ->withoutMiddleware('verified');
 
-    Route::post('/email/resend', [AuthController::class, 'resendVerification']);
+    Route::post('/email/resend', [AuthController::class, 'resendVerification'])
+        ->withoutMiddleware('verified')
+        ->middleware('throttle:6,1');
 
 
     /*
