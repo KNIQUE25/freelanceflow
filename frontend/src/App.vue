@@ -19,6 +19,6 @@ onMounted(async () => {
     // Then fetch user
     await authStore.fetchUser()
 
-     themeStore.init()
+     themeStore.initializeTheme()
 })
 </script>

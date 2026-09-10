@@ -1,7 +1,10 @@
-import api from '@/api/axios'
+import api, { setCsrfToken } from '@/api/axios'
 
 export async function getCsrfCookie() {
     await api.get('/sanctum/csrf-cookie')
+
+    const response = await api.get('/api/csrf-token')
+    setCsrfToken(response.data.xsrf_token)
 }
 
 export async function register(data) {

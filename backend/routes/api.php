@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Crypt;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
@@ -28,6 +30,18 @@ use App\Http\Controllers\Admin\AdminSystemController;
 | Public authentication
 |--------------------------------------------------------------------------
 */
+
+Route::get('/csrf-token', function () {
+    $token = csrf_token();
+    $encrypter = app('encrypter');
+
+    return response()->json([
+        'csrf_token' => $token,
+        'xsrf_token' => Crypt::encryptString(
+            CookieValuePrefix::create('XSRF-TOKEN', $encrypter->getKey()).$token
+        ),
+    ]);
+})->name('csrf.token');
 
 Route::post('/register', [AuthController::class, 'register'])
     ->name('register');
