@@ -1,21 +1,46 @@
 import api from '@/api/axios'
 
-export async function getCsrfCookie() {
-    await api.get('/sanctum/csrf-cookie')
+let csrfRefreshPromise = null
+
+export function getCsrfCookie() {
+    if (!csrfRefreshPromise) {
+        csrfRefreshPromise = api.get('/sanctum/csrf-cookie')
+            .then(() => undefined)
+            .finally(() => {
+                csrfRefreshPromise = null
+            })
+    }
+
+    return csrfRefreshPromise
+}
+
+export async function withCsrfRecovery(request) {
+    await getCsrfCookie()
+
+    try {
+        return await request()
+    } catch (error) {
+        if (error.response?.status !== 419) {
+            throw error
+        }
+
+        await getCsrfCookie()
+        return request()
+    }
 }
 
 export async function register(data) {
-    await getCsrfCookie()
-
-    const response = await api.post('/api/register', data)
+    const response = await withCsrfRecovery(() =>
+        api.post('/api/register', data)
+    )
 
     return response.data
 }
 
 export async function login(data) {
-    await getCsrfCookie()
-
-    const response = await api.post('/api/login', data)
+    const response = await withCsrfRecovery(() =>
+        api.post('/api/login', data)
+    )
 
     return response.data
 }
@@ -27,26 +52,27 @@ export async function getUser() {
 }
 
 export async function logout() {
-    await getCsrfCookie()
-    const response = await api.post('/api/logout')
+    const response = await withCsrfRecovery(() =>
+        api.post('/api/logout')
+    )
 
     return response.data
 }
 
 export async function forgotPassword(email) {
-    await getCsrfCookie()
-
-    const response = await api.post('/api/forgot-password', {
-        email,
-    })
+    const response = await withCsrfRecovery(() =>
+        api.post('/api/forgot-password', {
+            email,
+        })
+    )
 
     return response.data
 }
 
 export async function resetPassword(data) {
-    await getCsrfCookie()
-
-    const response = await api.post('/api/reset-password', data)
+    const response = await withCsrfRecovery(() =>
+        api.post('/api/reset-password', data)
+    )
 
     return response.data
 }
