@@ -4,43 +4,61 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 
 class AdminUserController extends Controller
 {
+    public function __construct(protected UserService $userService)
+    {
+    }
+
     public function index(Request $request)
     {
-        $users = User::withCount(['clients', 'invoices'])
-            ->when($request->search, function ($q, $search) {
-                $q->where('name', 'LIKE', "%{$search}%")
-                  ->orWhere('email', 'LIKE', "%{$search}%");
-            })
-            ->latest()
-            ->paginate(20);
-        return response()->json($users);
+        return response()->json(
+            $this->userService->getUsers(
+                search: $request->input('search'),
+                perPage: 20
+            )
+        );
     }
 
     public function show(User $user)
     {
-        $user->loadCount(['clients', 'invoices']);
-        return response()->json($user);
+        return response()->json($this->userService->getUser($user));
+    }
+
+    public function getAllUsers()
+    {
+        return response()->json($this->userService->getAllUsers());
     }
 
     public function suspend(User $user)
     {
-        $user->update(['suspended_at' => now()]);
-        return response()->json(['message' => 'User suspended.']);
+        $user = $this->userService->suspendUser($user);
+
+        return response()->json([
+            'message' => 'User suspended.',
+            'user' => $user,
+        ]);
     }
 
     public function activate(User $user)
     {
-        $user->update(['suspended_at' => null]);
-        return response()->json(['message' => 'User activated.']);
+        $user = $this->userService->activateUser($user);
+
+        return response()->json([
+            'message' => 'User activated.',
+            'user' => $user,
+        ]);
     }
 
     public function destroy(User $user)
     {
-        $user->delete();
-        return response()->json(['message' => 'User deleted.']);
+        $this->userService->deleteUser($user);
+
+        return response()->json([
+            'message' => 'User deleted.',
+        ]);
     }
 }
