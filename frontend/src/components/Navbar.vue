@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useNotificationsStore } from '../stores/notifications'
@@ -56,4 +56,6 @@ const handleLogout = async () => {
   await authStore.logout()
   router.push('/login')
 }
+
+onMounted(() => notificationsStore.fetchNotifications())
 </script>

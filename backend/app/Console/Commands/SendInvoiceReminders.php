@@ -16,10 +16,10 @@ class SendInvoiceReminders extends Command
         $count = 0;
         foreach ([1, 3, 7] as $days) {
             $target = today()->addDays($days);
-            Invoice::query()->whereDate('due_date', $target)->whereIn('status', ['unpaid', 'partially_paid'])->with('client')->chunkById(100, function ($invoices) use (&$count, $days) {
+            Invoice::query()->whereDate('due_date', $target)->whereIn('status', ['unpaid', 'partially_paid'])->with('client.user')->chunkById(100, function ($invoices) use (&$count, $days) {
                 foreach ($invoices as $invoice) {
-                    // Notify the client (who owes the money), not the freelancer who owns the record.
-                    $invoice->client?->notify(new InvoiceDueNotification($invoice, $days));
+                    // Clients are contact records, so notify the authenticated owner.
+                    $invoice->client?->user?->notify(new InvoiceDueNotification($invoice, $days));
                     $count++;
                 }
             });

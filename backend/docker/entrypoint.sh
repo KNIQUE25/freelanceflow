@@ -16,15 +16,16 @@ php artisan route:clear
 echo "Running database migrations..."
 php artisan migrate --force --no-interaction
 
-if [ -n "${ADMIN_EMAIL:-}" ] && [ -n "${ADMIN_PASSWORD:-}" ]; then
-    echo "Provisioning configured administrator..."
-    php artisan db:seed \
-        --class=AdminUserSeeder \
-        --force \
-        --no-interaction
-else
-    echo "ADMIN_EMAIL and ADMIN_PASSWORD are not configured; skipping administrator provisioning."
+if [ -z "${ADMIN_EMAIL:-}" ] || [ -z "${ADMIN_PASSWORD:-}" ]; then
+    echo "ADMIN_EMAIL and ADMIN_PASSWORD must be configured for production startup." >&2
+    exit 1
 fi
+
+echo "Provisioning configured administrator..."
+php artisan db:seed \
+    --class=AdminUserSeeder \
+    --force \
+    --no-interaction
 
 echo "Caching configuration..."
 php artisan config:cache

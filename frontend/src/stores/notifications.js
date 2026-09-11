@@ -1,6 +1,15 @@
 import { defineStore } from 'pinia'
 import { getNotifications, markAsRead, markAllRead } from '../services/notifications'
 
+function getErrorMessage(error) {
+  const status = error.response?.status
+  if (status === 401) return 'Please sign in to view notifications.'
+  if (status === 403) return 'You are not authorized to view notifications.'
+  if (status === 419) return 'Your session expired. Please try again.'
+  if (status >= 500) return 'Notification service is temporarily unavailable.'
+  return error.response?.data?.message || 'Unable to load notifications.'
+}
+
 export const useNotificationsStore = defineStore('notifications', {
   state: () => ({
     notifications: [],
@@ -16,7 +25,7 @@ export const useNotificationsStore = defineStore('notifications', {
         this.unreadCount = data.filter(n => !n.read_at).length
         return { success: true, data }
       } catch (error) {
-        return { success: false, message: error.response?.data?.message }
+        return { success: false, message: getErrorMessage(error) }
       } finally {
         this.isLoading = false
       }
@@ -27,7 +36,7 @@ export const useNotificationsStore = defineStore('notifications', {
         await this.fetchNotifications()
         return { success: true }
       } catch (error) {
-        return { success: false, message: error.response?.data?.message }
+        return { success: false, message: getErrorMessage(error) }
       }
     },
     async markAllRead() {
@@ -36,7 +45,7 @@ export const useNotificationsStore = defineStore('notifications', {
         await this.fetchNotifications()
         return { success: true }
       } catch (error) {
-        return { success: false, message: error.response?.data?.message }
+        return { success: false, message: getErrorMessage(error) }
       }
     },
   },
